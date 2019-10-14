@@ -1,6 +1,6 @@
 package checkers
 
-object Hello extends Greeting with App {
+object App extends Greeting with App {
   println(Game.newGame())
 }
 
