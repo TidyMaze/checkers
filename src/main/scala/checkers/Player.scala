@@ -15,4 +15,8 @@ object Player {
 
   case object Player2 extends Player
 
+  val nextPlayer: Player => Player = {
+    case Player1 => Player2
+    case Player2 => Player1
+  }
 }

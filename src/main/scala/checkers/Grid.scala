@@ -30,4 +30,7 @@ object Grid {
     "-1-1-1-1",
     "1-1-1-1-"
   )
+
+  def update2D[A](matrix: Seq[Seq[A]], coord: Coord, elem: A): Seq[Seq[A]] =
+    matrix.updated(coord.y, matrix(coord.y).updated(coord.x, elem))
 }

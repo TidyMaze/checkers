@@ -2,8 +2,8 @@ package checkers
 
 import checkers.Coord.add
 import checkers.Direction.toOffset
-import checkers.Grid.{Grid, HEIGHT, WIDTH}
-import checkers.Player.{Player1, Player2}
+import checkers.Grid.{Grid, HEIGHT, WIDTH, update2D}
+import checkers.Player.{Player1, Player2, nextPlayer}
 
 import scala.util.{Failure, Success, Try}
 
@@ -19,11 +19,6 @@ object Game {
       Player1,
       None
     )
-  }
-
-  val nextPlayer: Player => Player = {
-    case Player1 => Player2
-    case Player2 => Player1
   }
 
   def isInGrid(coord: Coord): Boolean = coord.y >= 0 && coord.x >= 0 && coord.y < HEIGHT && coord.x < WIDTH
@@ -42,9 +37,6 @@ object Game {
   }
 
   def move(grid: Grid, from: Coord, to: Coord, player: Player): Grid = update2D(update2D(grid, from, None), to, Some(player))
-
-  def update2D[A](matrix: Seq[Seq[A]], coord: Coord, elem: A): Seq[Seq[A]] =
-    matrix.updated(coord.y, matrix(coord.y).updated(coord.x, elem))
 
   def findAllActions(state: State): Map[Action, State] = {
     val player = state.nextPlayer
