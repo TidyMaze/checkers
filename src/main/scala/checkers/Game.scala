@@ -50,7 +50,7 @@ object Game {
     }
   }
 
-  def move(grid: Seq[Seq[Option[Player]]], from: Coord, to: Coord, player: Player): Grid = update2D(update2D(grid, from, None), to, Some(player))
+  def move(grid: Grid, from: Coord, to: Coord, player: Player): Grid = update2D(update2D(grid, from, None), to, Some(player))
 
   def update2D[A](matrix: Seq[Seq[A]], coord: Coord, elem: A): Seq[Seq[A]] =
     matrix.updated(coord.y, matrix(coord.y).updated(coord.x, elem))
@@ -68,7 +68,7 @@ object Game {
     } yield action -> resState).toMap
   }
 
-  def findPiecesCoords(grid: Seq[Seq[Option[Player]]]): Map[Player, Seq[Coord]] = {
+  def findPiecesCoords(grid: Grid): Map[Player, Seq[Coord]] = {
     (for {
       y <- 0 until HEIGHT
       x <- 0 until WIDTH
