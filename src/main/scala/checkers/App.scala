@@ -17,9 +17,12 @@ object App extends Greeting with App {
   println()
 
   val turns = 10
-  val endState = playSeveralTurnsRandomly(state, turns)
+  val states = playSeveralTurnsRandomly(state, turns)
   println(s"after $turns turns")
-  println(endState)
+  states.foreach { s =>
+    println(s)
+    println()
+  }
 }
 
 trait Greeting {

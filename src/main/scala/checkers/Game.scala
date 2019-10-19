@@ -71,20 +71,16 @@ object Game {
       .mapValues(_.map { case (_, coord) => coord })
   }
 
-  @scala.annotation.tailrec
-  def playSeveralTurnsRandomly(state: State, turns: Int): State = {
+  def playSeveralTurnsRandomly(state: State, turns: Int): Seq[State] = {
     turns match {
-      case 0 => state
+      case 0 => state :: Nil
       case remainingTurns =>
         val actions = findAllActions(state)
         if (actions.isEmpty) {
-          State(state.grid, state.nextPlayer, Some(nextPlayer(state.nextPlayer)))
+          State(state.grid, state.nextPlayer, Some(nextPlayer(state.nextPlayer))) :: Nil
         } else {
           val (_, newState) = RandomHelpers.randomIn(actions.toSeq).get
-          println(s"$turns/")
-          println(newState)
-          println()
-          playSeveralTurnsRandomly(newState, remainingTurns - 1)
+          newState +: playSeveralTurnsRandomly(newState, remainingTurns - 1)
         }
     }
   }
