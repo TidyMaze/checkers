@@ -11,4 +11,3 @@ object Direction extends Enumeration {
     DownRight -> Coord(1, 1)
   )
 }
-

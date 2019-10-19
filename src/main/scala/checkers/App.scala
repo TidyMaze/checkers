@@ -6,9 +6,11 @@ object App extends Greeting with App {
   println()
   val actions = Game.findAllActions(state)
   println(s"${actions.size} actions:")
+  println(actions.map{ case (action, _) => action}.mkString("\n"))
+  println()
+
   actions.foreach {
-    case (action, resState) =>
-      println(s"$action =>")
+    case (_, resState) =>
       println(resState)
       println()
   }
