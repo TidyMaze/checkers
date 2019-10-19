@@ -10,18 +10,8 @@ import scala.util.{Failure, Success, Try}
 object Game {
 
   def newGame(): State = {
-    val initPattern = Seq(
-      "-2-2-2-2",
-      "2-2-2-2-",
-      "--------",
-      "--------",
-      "--------",
-      "--------",
-      "-1-1-1-1",
-      "1-1-1-1-"
-    )
     State(
-      initPattern.map(line => line.toList.map {
+      Grid.initPattern.map(line => line.toList.map {
         case '-' => None
         case '1' => Some(Player1)
         case '2' => Some(Player2)
@@ -42,9 +32,9 @@ object Game {
 
     if (!isInGrid(destCoord)) {
       Failure(new RuntimeException("Invalid coord outside of grid"))
-    } else if(state.grid(destCoord.y)(destCoord.x).isDefined) {
+    } else if (state.grid(destCoord.y)(destCoord.x).isDefined) {
       Failure(new RuntimeException("Invalid coord already occupied"))
-    }else {
+    } else {
       val resGrid = move(state.grid, action.from, destCoord, state.nextPlayer)
       Success(State(resGrid, nextPlayer(state.nextPlayer)))
     }
