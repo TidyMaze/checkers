@@ -11,4 +11,12 @@ object Grid {
       case Some(owner) => owner.toString
       case None => "-"
     })
+
+  def printableGrids(grids: Seq[Grid]): String = {
+    val displayableGrids = grids.map(asPrintable2DArray)
+    (for {
+      y <- 0 until HEIGHT
+      eachLineFromGrids = displayableGrids.map(_(y)).map(_.mkString("")).mkString("     ")
+    } yield eachLineFromGrids).mkString("\n")
+  }
 }

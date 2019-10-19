@@ -9,11 +9,9 @@ object App extends Greeting with App {
   println(actions.map{ case (action, _) => action}.mkString("\n"))
   println()
 
-  actions.foreach {
-    case (_, resState) =>
-      println(resState)
-      println()
-  }
+  println(Grid.printableGrids(actions.map {
+    case (_, resState) => resState.grid
+  }.toSeq))
 }
 
 trait Greeting {
