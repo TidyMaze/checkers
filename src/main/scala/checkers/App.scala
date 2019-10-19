@@ -1,5 +1,7 @@
 package checkers
 
+import checkers.Game.playSeveralTurnsRandomly
+
 object App extends Greeting with App {
   val state: State = Game.newGame()
   println(state)
@@ -12,6 +14,12 @@ object App extends Greeting with App {
   println(Grid.printableGrids(actions.map {
     case (_, resState) => resState.grid
   }.toSeq))
+  println()
+
+  val turns = 10
+  val endState = playSeveralTurnsRandomly(state, turns)
+  println(s"after $turns turns")
+  println(endState)
 }
 
 trait Greeting {

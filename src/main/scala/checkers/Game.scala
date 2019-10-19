@@ -16,7 +16,8 @@ object Game {
         case '1' => Some(Player1)
         case '2' => Some(Player2)
       }),
-      Player1
+      Player1,
+      None
     )
   }
 
@@ -36,7 +37,7 @@ object Game {
       Failure(new RuntimeException("Invalid coord already occupied"))
     } else {
       val resGrid = move(state.grid, action.from, destCoord, state.nextPlayer)
-      Success(State(resGrid, nextPlayer(state.nextPlayer)))
+      Success(State(resGrid, nextPlayer(state.nextPlayer), state.winner))
     }
   }
 
@@ -69,4 +70,23 @@ object Game {
       .groupBy { case (player, _) => player }
       .mapValues(_.map { case (_, coord) => coord })
   }
+
+  @scala.annotation.tailrec
+  def playSeveralTurnsRandomly(state: State, turns: Int): State = {
+    turns match {
+      case 0 => state
+      case remainingTurns =>
+        val actions = findAllActions(state)
+        if (actions.isEmpty) {
+          State(state.grid, state.nextPlayer, Some(nextPlayer(state.nextPlayer)))
+        } else {
+          val (_, newState) = RandomHelpers.randomIn(actions.toSeq).get
+          println(s"$turns/")
+          println(newState)
+          println()
+          playSeveralTurnsRandomly(newState, remainingTurns - 1)
+        }
+    }
+  }
+
 }

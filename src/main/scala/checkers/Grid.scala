@@ -16,7 +16,7 @@ object Grid {
     val displayableGrids = grids.map(asPrintable2DArray)
     (for {
       y <- 0 until HEIGHT
-      eachLineFromGrids = displayableGrids.map(_(y)).map(_.mkString("")).mkString("\t")
+      eachLineFromGrids = displayableGrids.map(_(y)).map(_.mkString(" ")).mkString("\t\t")
     } yield eachLineFromGrids).mkString("\n")
   }
 
