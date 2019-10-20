@@ -1,6 +1,6 @@
 package checkers
 
-import checkers.Game.playSeveralTurnsRandomly
+import checkers.Game._
 
 object App extends Greeting with App {
   val state: State = Game.newGame()
@@ -17,7 +17,7 @@ object App extends Greeting with App {
   println()
 
   val turns = 10
-  val states = playSeveralTurnsRandomly(state, turns)
+  val states = playSeveralTurnsWithEvalFunction(state, turns, basicEvalFunction)
   println(s"after $turns turns")
   states.foreach { s =>
     println(s)

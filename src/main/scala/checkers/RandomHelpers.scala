@@ -8,4 +8,6 @@ object RandomHelpers {
   def randomIn[A](arr: Seq[A]): Try[A] =
     if(arr.isEmpty) Failure(new RuntimeException("empty array"))
     else Success(arr(random.nextInt(arr.size)))
+
+  def randPct(): Double = random.nextDouble()
 }
