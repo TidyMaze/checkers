@@ -24,19 +24,19 @@ object Game {
   }
 
   def playSeveralTurnsRandomly(state: State, turns: Int): List[State] =
-    playSeveralTurnsWithEvalFunction(state, turns, _ => 0)
+    playSeveralTurnsWithEvalFunction(state, turns, (_, _) => 0)
 
-  def playSeveralTurnsWithEvalFunction(state: State, turns: Int, eval: State => Double): List[State] =
+  def playSeveralTurnsWithEvalFunction(state: State, turns: Int, eval: (State, Player) => Double): List[State] =
     playTillEndWithEvalFunction(state, eval).take(turns)
 
-  def playTillEndWithEvalFunction(state: State, eval: State => Double): List[State] = {
+  def playTillEndWithEvalFunction(state: State, eval: (State, Player) => Double): List[State] = {
     @tailrec
     def aux(s: State, acc: List[State]): List[State] = {
       val actions = findAllActions(s)
       if (actions.isEmpty) {
         acc.reverse
       } else {
-        val (_, newState) = shuffle(actions.toSeq).maxBy { case (_, state) => eval(state) }
+        val (_, newState) = shuffle(actions.toSeq).maxBy { case (_, candidateState) => eval(candidateState, s.nextPlayer) }
         aux(newState, newState +: acc)
       }
     }
@@ -105,8 +105,8 @@ object Game {
       .mapValues(_.map { case (_, coord) => coord })
   }
 
-  def basicEvalFunction(state: State): Double = {
+  def basicEvalFunction(state: State, player: Player): Double = {
     val pieces = Game.findPiecesCoords(state.grid)
-    pieces.getOrElse(state.nextPlayer, Nil).size - pieces.getOrElse(Player.nextPlayer(state.nextPlayer), Nil).size
+    pieces.getOrElse(player, Nil).size - pieces.getOrElse(Player.nextPlayer(player), Nil).size
   }
 }
