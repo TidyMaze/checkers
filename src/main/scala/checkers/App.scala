@@ -33,6 +33,9 @@ object App extends App {
     history.size
   }
 
+  val min = allSizes.min
   val avg = average(allSizes)
-  println(s"Average game size over ${allSizes.size} samples: $avg")
+  val max = allSizes.max
+
+  println(s"Game stats over ${allSizes.size} samples: $min - $avg - $max")
 }
