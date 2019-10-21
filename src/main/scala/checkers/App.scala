@@ -16,13 +16,15 @@ object App extends Greeting with App {
   }.toSeq))
   println()
 
-  val turns = 100
-  val states = playSeveralTurnsWithEvalFunction(state, turns, basicEvalFunction)
-  println(s"after $turns turns")
+  val states = playTillEndWithEvalFunction(state, basicEvalFunction)
+  println(s"after ${states.size} turns")
   states.foreach { s =>
     println(s)
     println()
   }
+
+  val endGameWinner: Option[String] = states.lastOption.flatMap(_.winner.map(_.toString))
+  println(s"winner is ${endGameWinner.getOrElse("nobody")}")
 }
 
 trait Greeting {
