@@ -7,6 +7,8 @@ import checkers.Player.{Player1, Player2, nextPlayer}
 
 import scala.util.{Failure, Success, Try}
 
+import RandomHelpers.shuffle
+
 object Game {
 
   def newGame(): State = {
@@ -63,7 +65,7 @@ object Game {
       .mapValues(_.map { case (_, coord) => coord })
   }
 
-  def playSeveralTurnsRandomly(state: State, turns: Int): Seq[State] = playSeveralTurnsWithEvalFunction(state, turns, _ => RandomHelpers.randPct())
+  def playSeveralTurnsRandomly(state: State, turns: Int): Seq[State] = playSeveralTurnsWithEvalFunction(state, turns, _ => 0)
 
   def playSeveralTurnsWithEvalFunction(state: State, turns: Int, eval: State => Double): Seq[State] = {
     turns match {
@@ -73,7 +75,7 @@ object Game {
         if (actions.isEmpty) {
           State(state.grid, state.nextPlayer, Some(nextPlayer(state.nextPlayer))) :: Nil
         } else {
-          val (_, newState) = actions.toSeq.maxBy { case (_, state) => eval(state)}
+          val (_, newState) = shuffle(actions.toSeq).maxBy { case (_, state) => eval(state)}
           newState +: playSeveralTurnsRandomly(newState, remainingTurns - 1)
         }
     }

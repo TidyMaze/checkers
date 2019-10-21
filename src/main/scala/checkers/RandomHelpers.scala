@@ -10,4 +10,6 @@ object RandomHelpers {
     else Success(arr(random.nextInt(arr.size)))
 
   def randPct(): Double = random.nextDouble()
+
+  def shuffle[A](arr: Seq[A]) = random.shuffle(arr)
 }

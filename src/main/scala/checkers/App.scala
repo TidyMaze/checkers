@@ -16,7 +16,7 @@ object App extends Greeting with App {
   }.toSeq))
   println()
 
-  val turns = 10
+  val turns = 100
   val states = playSeveralTurnsWithEvalFunction(state, turns, basicEvalFunction)
   println(s"after $turns turns")
   states.foreach { s =>
