@@ -60,19 +60,24 @@ object Game {
 
     if (!isInGrid(destCoord)) {
       Failure(new RuntimeException("Invalid coord outside of grid"))
-    } else if (state.grid(destCoord.y)(destCoord.x).isDefined) {
-      val destCoord2 = add(destCoord, offset)
-      if (!isInGrid(destCoord2)) {
-        Failure(new RuntimeException("Invalid coord outside of grid"))
-      } else if (state.grid(destCoord2.y)(destCoord2.x).isDefined) {
-        Failure(new RuntimeException("Invalid coord already occupied"))
-      } else {
-        val resGrid2 = jump(state.grid, action.from, destCoord, destCoord2, state.nextPlayer)
-        Success(State(resGrid2, nextPlayer(state.nextPlayer), winner(resGrid2)))
-      }
     } else {
-      val resGrid = move(state.grid, action.from, destCoord, state.nextPlayer)
-      Success(State(resGrid, nextPlayer(state.nextPlayer), winner(resGrid)))
+      val target1 = state.grid(destCoord.y)(destCoord.x)
+      if (target1.isDefined) {
+        val destCoord2 = add(destCoord, offset)
+        if (!isInGrid(destCoord2)) {
+          Failure(new RuntimeException("Invalid coord outside of grid"))
+        } else if (target1.contains(state.nextPlayer)) {
+          Failure(new RuntimeException("Cannot jump same player"))
+        } else if (state.grid(destCoord2.y)(destCoord2.x).isDefined) {
+          Failure(new RuntimeException("Invalid coord already occupied"))
+        } else {
+          val resGrid2 = jump(state.grid, action.from, destCoord, destCoord2, state.nextPlayer)
+          Success(State(resGrid2, nextPlayer(state.nextPlayer), winner(resGrid2)))
+        }
+      } else {
+        val resGrid = move(state.grid, action.from, destCoord, state.nextPlayer)
+        Success(State(resGrid, nextPlayer(state.nextPlayer), winner(resGrid)))
+      }
     }
   }
 

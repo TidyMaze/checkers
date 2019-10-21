@@ -1,8 +1,9 @@
 package checkers
 
 import checkers.Game._
+import MathsUtils._
 
-object App extends Greeting with App {
+object App extends App {
   val state: State = Game.newGame()
   println(state)
   println()
@@ -25,8 +26,13 @@ object App extends Greeting with App {
 
   val endGameWinner: Option[String] = states.lastOption.flatMap(_.winner.map(_.toString))
   println(s"winner is ${endGameWinner.getOrElse("nobody")}")
-}
 
-trait Greeting {
-  lazy val greeting: String = "hello"
+  val allSizes = (0 until 100) map {iGame =>
+    val state: State = Game.newGame()
+    val history = playTillEndWithEvalFunction(state, basicEvalFunction)
+    history.size
+  }
+
+  val avg = average(allSizes)
+  println(s"Average game size over ${allSizes.size} samples: $avg")
 }
