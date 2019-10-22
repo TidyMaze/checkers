@@ -42,7 +42,7 @@ object Game {
       if (actions.isEmpty) {
         acc.reverse
       } else {
-        val (_, newState) = shuffle(actions.toSeq).maxBy { case (_, candidateState) => eval(candidateState, s.nextPlayer) }
+        val (_, newState) = actions.par.maxBy { case (_, candidateState) => eval(candidateState, s.nextPlayer) }
         onTurn(newState)
         aux(newState, newState +: acc)
       }
@@ -139,7 +139,7 @@ object Game {
   }
 
   def monteCarloEvalFunction(samples: Int)(state: State, player: Player): Double = {
-    val allWinnersGrouped = (0 until samples).map { iGame =>
+    val allWinnersGrouped = (0 until samples).par.map { iGame =>
       print(".")
       playTillEndRandomlyNoHistory(state, _ => ()).winner
     }.groupBy(identity).mapValues(_.size)
