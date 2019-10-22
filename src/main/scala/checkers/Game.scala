@@ -26,10 +26,16 @@ object Game {
   def playSeveralTurnsRandomly(state: State, turns: Int): List[State] =
     playSeveralTurnsWithEvalFunction(state, turns, (_, _) => 0)
 
+  def playTillEndRandomly(state: State, onTurn: State => Unit): List[State] =
+    playTillEndWithEvalFunction(state, (_, _) => 0, onTurn)
+
+  def playTillEndRandomlyNoHistory(state: State, onTurn: State => Unit): State =
+    playTillEndWithEvalFunctionNoHistory(state, (_, _) => 0, onTurn)
+
   def playSeveralTurnsWithEvalFunction(state: State, turns: Int, eval: (State, Player) => Double): List[State] =
     playTillEndWithEvalFunction(state, eval).take(turns)
 
-  def playTillEndWithEvalFunction(state: State, eval: (State, Player) => Double): List[State] = {
+  def playTillEndWithEvalFunction(state: State, eval: (State, Player) => Double, onTurn: State => Unit = _ => ()): List[State] = {
     @tailrec
     def aux(s: State, acc: List[State]): List[State] = {
       val actions = findAllActions(s)
@@ -37,11 +43,28 @@ object Game {
         acc.reverse
       } else {
         val (_, newState) = shuffle(actions.toSeq).maxBy { case (_, candidateState) => eval(candidateState, s.nextPlayer) }
+        onTurn(newState)
         aux(newState, newState +: acc)
       }
     }
 
     aux(state, Nil)
+  }
+
+  def playTillEndWithEvalFunctionNoHistory(state: State, eval: (State, Player) => Double, onTurn: State => Unit = _ => ()): State = {
+    @tailrec
+    def aux(s: State): State = {
+      val actions = findAllActions(s)
+      if (actions.isEmpty) {
+        s
+      } else {
+        val (_, newState) = shuffle(actions.toSeq).maxBy { case (_, candidateState) => eval(candidateState, s.nextPlayer) }
+        onTurn(newState)
+        aux(newState)
+      }
+    }
+
+    aux(state)
   }
 
   def findAllActions(state: State): Map[Action, State] = {
@@ -113,5 +136,14 @@ object Game {
   def basicEvalFunction(state: State, player: Player): Double = {
     val pieces = Game.findPiecesCoords(state.grid)
     pieces.getOrElse(player, Nil).size - pieces.getOrElse(Player.nextPlayer(player), Nil).size
+  }
+
+  def monteCarloEvalFunction(samples: Int)(state: State, player: Player): Double = {
+    val allWinnersGrouped = (0 until samples).map { iGame =>
+      print(".")
+      playTillEndRandomlyNoHistory(state, _ => ()).winner
+    }.groupBy(identity).mapValues(_.size)
+
+    (allWinnersGrouped.getOrElse(Some(player), 0).toDouble + allWinnersGrouped.getOrElse(None, 0).toDouble / 2) / samples.toDouble
   }
 }
