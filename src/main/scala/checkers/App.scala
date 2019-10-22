@@ -13,7 +13,7 @@ object App extends App {
 
   println(Grid.printableGrids(actions.map {
     case (_, resState) => resState.grid
-  }.toSeq))
+  }.toList))
   println()
 
   val turnHandler: State => Unit = currentState => {
@@ -21,7 +21,7 @@ object App extends App {
     println(currentState)
   }
 
-  val states = playTillEndWithEvalFunction(state, monteCarloEvalFunction(10), turnHandler)
+  val states = playTillEndWithEvalFunction(state, monteCarloEvalFunction(50), turnHandler)
   println(s"after ${states.size} turns")
   states.foreach { s =>
     println(s)
