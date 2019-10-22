@@ -4,10 +4,10 @@ import checkers.Coord.add
 import checkers.Direction.toOffset
 import checkers.Grid.{Grid, HEIGHT, WIDTH, update2D}
 import checkers.Player.{Player1, Player2, nextPlayer}
-import checkers.RandomHelpers.shuffle
 
 import scala.annotation.tailrec
 import scala.util.{Failure, Success, Try}
+import RandomHelpers._
 
 object Game {
 
@@ -23,17 +23,8 @@ object Game {
     )
   }
 
-  def playSeveralTurnsRandomly(state: State, turns: Int): List[State] =
-    playSeveralTurnsWithEvalFunction(state, turns, (_, _) => 0)
-
-  def playTillEndRandomly(state: State, onTurn: State => Unit): List[State] =
-    playTillEndWithEvalFunction(state, (_, _) => 0, onTurn)
-
   def playTillEndRandomlyNoHistory(state: State, onTurn: State => Unit): State =
-    playTillEndWithEvalFunctionNoHistory(state, (_, _) => 0, onTurn)
-
-  def playSeveralTurnsWithEvalFunction(state: State, turns: Int, eval: (State, Player) => Double): List[State] =
-    playTillEndWithEvalFunction(state, eval).take(turns)
+    playTillEndWithEvalFunctionNoHistory(state, (_, _) => randPct, onTurn)
 
   def playTillEndWithEvalFunction(state: State, eval: (State, Player) => Double, onTurn: State => Unit = _ => ()): List[State] = {
     @tailrec
@@ -42,7 +33,7 @@ object Game {
       if (actions.isEmpty) {
         acc.reverse
       } else {
-        val (_, newState) = actions.par.maxBy { case (_, candidateState) => eval(candidateState, s.nextPlayer) }
+        val (action, newState, score) = actions.par.map { case (a, candidateState) => (a, candidateState, eval(candidateState, s.nextPlayer)) }.toList.maxBy { case (a, candidateState, score) => score }
         onTurn(newState)
         aux(newState, newState +: acc)
       }
@@ -58,7 +49,7 @@ object Game {
       if (actions.isEmpty) {
         s
       } else {
-        val (_, newState) = shuffle(actions.toSeq).maxBy { case (_, candidateState) => eval(candidateState, s.nextPlayer) }
+        val (score, newState) = actions.toSeq.maxBy { case (_, candidateState) => eval(candidateState, s.nextPlayer) }
         onTurn(newState)
         aux(newState)
       }
@@ -143,7 +134,7 @@ object Game {
       print(".")
       playTillEndRandomlyNoHistory(state, _ => ()).winner
     }.groupBy(identity).mapValues(_.size)
-
+    print("_")
     (allWinnersGrouped.getOrElse(Some(player), 0).toDouble + allWinnersGrouped.getOrElse(None, 0).toDouble / 2) / samples.toDouble
   }
 }
