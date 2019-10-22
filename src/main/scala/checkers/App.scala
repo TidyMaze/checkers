@@ -16,8 +16,9 @@ object App extends App {
   }.toList))
   println()
 
-  val turnHandler: State => Unit = currentState => {
+  val turnHandler: (Action, State, Double) => Unit = (action, currentState, score) => {
     println()
+    println(s"Playing $action with expected winrate $score for player ${Player.nextPlayer(currentState.nextPlayer)}")
     println(currentState)
   }
 

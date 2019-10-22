@@ -27,7 +27,7 @@ object Game {
   def playTillEndRandomlyNoHistory(state: State, onTurn: State => Unit): State =
     playTillEndWithEvalFunctionNoHistory(state, (_, _) => randPct, onTurn)
 
-  def playTillEndWithEvalFunction(state: State, eval: (State, Player) => Double, onTurn: State => Unit = _ => ()): List[State] = {
+  def playTillEndWithEvalFunction(state: State, eval: (State, Player) => Double, onTurn: (Action, State, Double) => Unit = (_, _, _) => ()): List[State] = {
     @tailrec
     def aux(s: State, acc: List[State]): List[State] = {
       val actions = findAllActions(s)
@@ -35,7 +35,7 @@ object Game {
         acc.reverse
       } else {
         val (action, newState, score) = actions.map { case (a, candidateState) => (a, candidateState, eval(candidateState, s.nextPlayer)) }.toList.maxBy { case (a, candidateState, score) => score }
-        onTurn(newState)
+        onTurn(action, newState, score)
         aux(newState, newState +: acc)
       }
     }
