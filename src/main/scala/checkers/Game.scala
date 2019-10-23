@@ -92,7 +92,7 @@ object Game {
         }
       } else {
         val resGrid = move(state.grid, action.from, destCoord, state.nextPlayer)
-        Success(State(resGrid, nextPlayer(state.nextPlayer), winner(resGrid)))
+        Success(State(resGrid, nextPlayer(state.nextPlayer), state.winner))
       }
     }
   }

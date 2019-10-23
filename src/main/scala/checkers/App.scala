@@ -22,7 +22,7 @@ object App extends App {
     println(currentState)
   }
 
-  val states = playTillEndWithEvalFunction(state, monteCarloEvalFunction(100), turnHandler)
+  val states = playTillEndWithEvalFunction(state, monteCarloEvalFunction(500), turnHandler)
   println(s"after ${states.size} turns")
   states.foreach { s =>
     println(s)
