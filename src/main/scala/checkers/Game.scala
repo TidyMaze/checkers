@@ -132,10 +132,10 @@ object Game {
 
   def monteCarloEvalFunction(samples: Int)(state: State, player: Player): Double = {
     val allWinnersGrouped = (0 until samples).par.map { iGame =>
-      print(".")
+//      print(".")
       playTillEndRandomlyNoHistory(state, _ => ()).winner
     }.groupBy(identity).mapValues(_.size)
-//    print("_")
+    print("_")
     (allWinnersGrouped.getOrElse(Some(player), 0).toDouble + allWinnersGrouped.getOrElse(None, 0).toDouble / 2) / samples.toDouble
   }
 }
