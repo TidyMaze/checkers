@@ -34,7 +34,7 @@ object Game {
       if (actions.isEmpty) {
         acc.reverse
       } else {
-        val (action, newState, score) = actions.map { case (a, candidateState) => (a, candidateState, eval(candidateState, s.nextPlayer)) }.toList.maxBy { case (a, candidateState, score) => score }
+        val (action, newState, score) = actions.map { case (a, candidateState) => (a, candidateState, eval(candidateState, s.nextPlayer)) }.maxBy { case (a, candidateState, score) => score }
         onTurn(action, newState, score)
         aux(newState, newState +: acc)
       }
@@ -50,7 +50,7 @@ object Game {
       if (actions.isEmpty) {
         s
       } else {
-        val (score, newState) = actions.toSeq.maxBy { case (_, candidateState) => eval(candidateState, s.nextPlayer) }
+        val (action, newState, score) = actions.map { case (a, candidateState) => (a, candidateState, eval(candidateState, s.nextPlayer)) }.maxBy { case (a, candidateState, score) => score }
         onTurn(newState)
         aux(newState)
       }
@@ -135,7 +135,7 @@ object Game {
       print(".")
       playTillEndRandomlyNoHistory(state, _ => ()).winner
     }.groupBy(identity).mapValues(_.size)
-    print("_")
+//    print("_")
     (allWinnersGrouped.getOrElse(Some(player), 0).toDouble + allWinnersGrouped.getOrElse(None, 0).toDouble / 2) / samples.toDouble
   }
 }
