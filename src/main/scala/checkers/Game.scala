@@ -7,7 +7,6 @@ import checkers.Player.nextPlayer
 import checkers.RandomHelpers._
 
 import scala.annotation.tailrec
-import scala.collection.parallel.ParMap
 import scala.util.{Failure, Success, Try}
 
 object Game {
@@ -35,7 +34,7 @@ object Game {
       if (actions.isEmpty) {
         acc.reverse
       } else {
-        val (action, newState, score) = actions.map { case (a, candidateState) => (a, candidateState, eval(candidateState, s.nextPlayer)) }.maxBy { case (a, candidateState, score) => score }
+        val (action, newState, score) = actions.par.map { case (a, candidateState) => (a, candidateState, eval(candidateState, s.nextPlayer)) }.maxBy { case (a, candidateState, score) => score }
         onTurn(action, newState, score)
         aux(newState, newState +: acc)
       }
@@ -60,9 +59,9 @@ object Game {
     aux(state)
   }
 
-  def findAllActions(state: State): ParMap[Action, State] = {
+  def findAllActions(state: State): Map[Action, State] = {
     (for {
-      from <- findPiecesCoords(state.grid).getOrElse(state.nextPlayer, Nil).par
+      from <- findPiecesCoords(state.grid).getOrElse(state.nextPlayer, Nil)
       dir <- Direction.values
       action = Action(from, dir)
       maybeResState = playAction(action, state).toOption
