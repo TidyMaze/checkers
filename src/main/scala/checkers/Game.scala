@@ -3,7 +3,7 @@ package checkers
 import checkers.Coord.add
 import checkers.Direction.toOffset
 import checkers.Grid.{Grid, HEIGHT, WIDTH, update2D}
-import checkers.Player.{Player1, Player2, nextPlayer}
+import checkers.Player.nextPlayer
 import checkers.RandomHelpers._
 
 import scala.annotation.tailrec
@@ -11,15 +11,16 @@ import scala.collection.parallel.ParMap
 import scala.util.{Failure, Success, Try}
 
 object Game {
+  type Player = Int
 
   def newGame(): State = {
     State(
       Grid.initPattern.map(line => line.toList.map {
-        case '-' => None
-        case '1' => Some(Player1)
-        case '2' => Some(Player2)
+        case '-' => 0
+        case '1' => 1
+        case '2' => 2
       }),
-      Player1,
+      1,
       None
     )
   }
@@ -77,13 +78,13 @@ object Game {
       Failure(new RuntimeException("Invalid coord outside of grid"))
     } else {
       val target1 = state.grid(destCoord.y)(destCoord.x)
-      if (target1.isDefined) {
+      if (target1 != 0) {
         val destCoord2 = add(destCoord, offset)
         if (!isInGrid(destCoord2)) {
           Failure(new RuntimeException("Invalid coord outside of grid"))
-        } else if (target1.contains(state.nextPlayer)) {
+        } else if (target1 == state.nextPlayer) {
           Failure(new RuntimeException("Cannot jump same player"))
-        } else if (state.grid(destCoord2.y)(destCoord2.x).isDefined) {
+        } else if (state.grid(destCoord2.y)(destCoord2.x) != 0) {
           Failure(new RuntimeException("Invalid coord already occupied"))
         } else {
           val resGrid2 = jump(state.grid, action.from, destCoord, destCoord2, state.nextPlayer)
@@ -100,27 +101,26 @@ object Game {
 
   def winner(grid: Grid): Option[Player] = {
     val playersPieces = findPiecesCoords(grid)
-    if (!playersPieces.isDefinedAt(Player1)) Some(Player2)
-    else if (!playersPieces.isDefinedAt(Player2)) Some(Player1)
+    if (!playersPieces.isDefinedAt(1)) Some(2)
+    else if (!playersPieces.isDefinedAt(2)) Some(1)
     else None
   }
 
-  def move(grid: Grid, from: Coord, to: Coord, player: Player): Grid = update2D(update2D(grid, from, None), to, Some(player))
+  def move(grid: Grid, from: Coord, to: Coord, player: Player): Grid = update2D(update2D(grid, from, 0), to, player)
 
   def jump(grid: Grid, from: Coord, jumped: Coord, to: Coord, player: Player): Grid = {
     eat(move(grid, from, to, player), jumped)
   }
 
-  def eat(grid: Grid, coord: Coord): Grid = update2D(grid, coord, None)
+  def eat(grid: Grid, coord: Coord): Grid = update2D(grid, coord, 0)
 
   def findPiecesCoords(grid: Grid): Map[Player, Seq[Coord]] = {
     (for {
       y <- 0 until HEIGHT
       x <- 0 until WIDTH
       line <- grid.lift(y)
-      cell <- line.lift(x)
-      player <- cell if cell.isDefined
-    } yield (player, Coord(x, y)))
+      cell <- line.lift(x) if cell != 0
+    } yield (cell, Coord(x, y)))
       .groupBy { case (player, _) => player }
       .mapValues(_.map { case (_, coord) => coord })
   }

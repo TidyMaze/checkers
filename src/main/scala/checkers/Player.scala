@@ -1,22 +1,11 @@
 package checkers
 
-import checkers.Player.{Player1, Player2}
-
-sealed trait Player {
-  override def toString: String = this match {
-    case Player1 => "1"
-    case Player2 => "2"
-  }
-}
+import checkers.Game.Player
 
 object Player {
 
-  case object Player1 extends Player
-
-  case object Player2 extends Player
-
   val nextPlayer: Player => Player = {
-    case Player1 => Player2
-    case Player2 => Player1
+    case 1 => 2
+    case 2 => 1
   }
 }

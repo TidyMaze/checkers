@@ -1,5 +1,6 @@
 package checkers
 
+import checkers.Game.Player
 import checkers.Grid.{Grid, asPrintable2DArray}
 
 case class State(grid: Grid, nextPlayer: Player, winner: Option[Player]) {

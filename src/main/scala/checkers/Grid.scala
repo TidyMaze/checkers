@@ -1,15 +1,16 @@
 package checkers
 
 object Grid {
-  type Grid = Seq[Seq[Option[Player]]]
+  type Grid = Seq[Seq[Int]]
 
   val HEIGHT = 8
   val WIDTH = 8
 
   def asPrintable2DArray(grid: Grid): Seq[Seq[String]] =
     grid.map(l => l.map {
-      case Some(owner) => owner.toString
-      case None => "-"
+      case 1 => "1"
+      case 2 => "2"
+      case 0 => "."
     })
 
   def printableGrids(grids: Seq[Grid]): String = {
