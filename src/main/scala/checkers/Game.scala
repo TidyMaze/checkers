@@ -63,7 +63,7 @@ object Game {
   def findAllActions(state: State): SeqView[(Action, State), Seq[_]] = {
     for {
       from <- shuffle(findPiecesCoords(state.grid).getOrElse(state.nextPlayer, Nil)).view
-      dir <- shuffle(Direction.values.toSeq)
+      dir <- shuffle(Direction.values.toSeq).view
       action = Action(from, dir)
       maybeResState = playAction(action, state).toOption
       resState <- maybeResState if maybeResState.isDefined
@@ -125,17 +125,16 @@ object Game {
       .mapValues(_.map { case (_, coord) => coord })
   }
 
-  def basicEvalFunction(state: State, player: Player): Double = {
-    val pieces = Game.findPiecesCoords(state.grid)
-    pieces.getOrElse(player, Nil).size - pieces.getOrElse(Player.nextPlayer(player), Nil).size
-  }
-
   def monteCarloEvalFunction(samples: Int)(state: State, player: Player): Double = {
-    val allWinnersGrouped = (0 until samples).par.map { iGame =>
+    val (res, resDraw) = (0 until samples).par.foldLeft((0,0)) { case ((count, countDraw), _) =>
 //      print(".")
-      playTillEndRandomlyNoHistory(state, _ => ()).winner
-    }.groupBy(identity).mapValues(_.size)
+      playTillEndRandomlyNoHistory(state, _ => ()).winner match {
+        case Some(`player`) => (count + 1, countDraw)
+        case None => (count, countDraw + 1)
+        case _ => (count, countDraw)
+      }
+    }
     print("_")
-    (allWinnersGrouped.getOrElse(Some(player), 0).toDouble + allWinnersGrouped.getOrElse(None, 0).toDouble / 2) / samples.toDouble
+    (res.toDouble + resDraw.toDouble / 2) / samples.toDouble
   }
 }
