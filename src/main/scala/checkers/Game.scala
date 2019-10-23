@@ -7,6 +7,7 @@ import checkers.Player.nextPlayer
 import checkers.RandomHelpers._
 
 import scala.annotation.tailrec
+import scala.collection.SeqView
 import scala.util.{Failure, Success, Try}
 
 object Game {
@@ -14,7 +15,7 @@ object Game {
 
   def newGame(): State = {
     State(
-      Grid.initPattern.map(line => line.toList.map {
+      Grid.initPattern.map(line => line.map {
         case '-' => 0
         case '1' => 1
         case '2' => 2
@@ -30,7 +31,7 @@ object Game {
   def playTillEndWithEvalFunction(state: State, eval: (State, Player) => Double, onTurn: (Action, State, Double) => Unit = (_, _, _) => ()): List[State] = {
     @tailrec
     def aux(s: State, acc: List[State]): List[State] = {
-      val actions = findAllActions(s)
+      val actions = findAllActions(s).toMap
       if (actions.isEmpty) {
         acc.reverse
       } else {
@@ -50,7 +51,7 @@ object Game {
       if (actions.isEmpty) {
         s
       } else {
-        val (action, newState, score) = actions.map { case (a, candidateState) => (a, candidateState, eval(candidateState, s.nextPlayer)) }.maxBy { case (a, candidateState, score) => score }
+        val newState = actions.head._2
         onTurn(newState)
         aux(newState)
       }
@@ -59,14 +60,14 @@ object Game {
     aux(state)
   }
 
-  def findAllActions(state: State): Map[Action, State] = {
-    (for {
-      from <- findPiecesCoords(state.grid).getOrElse(state.nextPlayer, Nil)
-      dir <- Direction.values
+  def findAllActions(state: State): SeqView[(Action, State), Seq[_]] = {
+    for {
+      from <- shuffle(findPiecesCoords(state.grid).getOrElse(state.nextPlayer, Nil)).view
+      dir <- shuffle(Direction.values.toSeq)
       action = Action(from, dir)
       maybeResState = playAction(action, state).toOption
       resState <- maybeResState if maybeResState.isDefined
-    } yield action -> resState).toMap
+    } yield action -> resState
   }
 
   def playAction(action: Action, state: State): Try[State] = {
