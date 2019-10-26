@@ -135,7 +135,7 @@ object Game {
   }
 
   def monteCarloEvalFunction(samples: Int)(state: State, player: Player, count: AtomicInteger): Double = {
-    val (res, resDraw) = (0 until samples).par.foldLeft((0,0)) { case ((c, cDraw), _) =>
+    val (res, resDraw) = (0 until samples).foldLeft((0,0)) { case ((c, cDraw), _) =>
 //      print(".")
       playTillEndRandomlyNoHistory(state, _ => (), count).winner match {
         case Some(`player`) => (c + 1, cDraw)
