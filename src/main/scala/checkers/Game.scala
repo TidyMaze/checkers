@@ -150,14 +150,22 @@ object Game {
   def eat(grid: Grid, coord: Coord): Grid = update2D(grid, coord, 0)
 
   def findPiecesCoords(grid: Grid): Map[Player, Seq[Coord]] = {
-    (for {
-      y <- 0 until HEIGHT
-      x <- 0 until WIDTH
-      line <- grid.lift(y)
-      cell <- line.lift(x) if cell != 0
-    } yield (cell, Coord(x, y)))
-      .groupBy { case (player, _) => player }
-      .mapValues(_.map { case (_, coord) => coord })
+    var res = new mutable.HashMap[Player, mutable.Seq[Coord]]()
+    var y = 0
+    while(y < HEIGHT){
+      var x = 0
+      while(x < WIDTH){
+        val cell = grid(y)(x)
+        if(cell != 0){
+          val curCoords = res.getOrElseUpdate(cell, mutable.Seq.empty)
+          res.put(cell, curCoords :+ Coord(x,y))
+        }
+        x += 1
+      }
+      y += 1
+    }
+
+    res.toMap
   }
 
   def monteCarloEvalFunction(samples: Int)(state: State, player: Player, count: AtomicInteger): Double = {
