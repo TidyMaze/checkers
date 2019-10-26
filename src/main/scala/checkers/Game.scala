@@ -1,5 +1,7 @@
 package checkers
 
+import java.util.concurrent.atomic.AtomicInteger
+
 import checkers.Coord.add
 import checkers.Direction.toOffset
 import checkers.Grid.{Grid, HEIGHT, WIDTH, update2D}
@@ -25,17 +27,23 @@ object Game {
     )
   }
 
-  def playTillEndRandomlyNoHistory(state: State, onTurn: State => Unit): State =
-    playTillEndWithEvalFunctionNoHistory(state, (_, _) => randPct, onTurn)
+  def playTillEndRandomlyNoHistory(state: State, onTurn: State => Unit, count: AtomicInteger): State =
+    playTillEndWithEvalFunctionNoHistory(state, (_, _) => randPct, onTurn, count)
 
-  def playTillEndWithEvalFunction(state: State, eval: (State, Player) => Double, onTurn: (Action, State, Double) => Unit = (_, _, _) => ()): List[State] = {
+  def playTillEndWithEvalFunction(state: State, eval: (State, Player, AtomicInteger) => Double, onTurn: (Action, State, Double) => Unit = (_, _, _) => ()): List[State] = {
     @tailrec
     def aux(s: State, acc: List[State]): List[State] = {
+      val count = new AtomicInteger()
+      val start = System.currentTimeMillis()
       val actions = findAllActions(s).toMap
       if (actions.isEmpty) {
         acc.reverse
       } else {
-        val (action, newState, score) = actions.par.map { case (a, candidateState) => (a, candidateState, eval(candidateState, s.nextPlayer)) }.maxBy { case (a, candidateState, score) => score }
+        val (action, newState, score) = actions.par.map { case (a, candidateState) => (a, candidateState, eval(candidateState, s.nextPlayer, count)) }.maxBy { case (a, candidateState, score) => score }
+        val end = System.currentTimeMillis()
+        val elapsed = (end - start) / 1000.0
+        println()
+        println(s"spent $elapsed sec for ${count.get} turns (${count.get / elapsed} t/sec)")
         onTurn(action, newState, score)
         aux(newState, newState +: acc)
       }
@@ -44,7 +52,7 @@ object Game {
     aux(state, Nil)
   }
 
-  def playTillEndWithEvalFunctionNoHistory(state: State, eval: (State, Player) => Double, onTurn: State => Unit = _ => ()): State = {
+  def playTillEndWithEvalFunctionNoHistory(state: State, eval: (State, Player) => Double, onTurn: State => Unit = _ => (), count: AtomicInteger): State = {
     @tailrec
     def aux(s: State): State = {
       val actions = findAllActions(s)
@@ -52,6 +60,7 @@ object Game {
         s
       } else {
         val newState = actions.head._2
+        count.incrementAndGet()
         onTurn(newState)
         aux(newState)
       }
@@ -125,13 +134,13 @@ object Game {
       .mapValues(_.map { case (_, coord) => coord })
   }
 
-  def monteCarloEvalFunction(samples: Int)(state: State, player: Player): Double = {
-    val (res, resDraw) = (0 until samples).par.foldLeft((0,0)) { case ((count, countDraw), _) =>
+  def monteCarloEvalFunction(samples: Int)(state: State, player: Player, count: AtomicInteger): Double = {
+    val (res, resDraw) = (0 until samples).par.foldLeft((0,0)) { case ((c, cDraw), _) =>
 //      print(".")
-      playTillEndRandomlyNoHistory(state, _ => ()).winner match {
-        case Some(`player`) => (count + 1, countDraw)
-        case None => (count, countDraw + 1)
-        case _ => (count, countDraw)
+      playTillEndRandomlyNoHistory(state, _ => (), count).winner match {
+        case Some(`player`) => (c + 1, cDraw)
+        case None => (c, cDraw + 1)
+        case _ => (c, cDraw)
       }
     }
     print("_")
