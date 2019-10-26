@@ -10,7 +10,6 @@ import checkers.RandomHelpers._
 
 import scala.annotation.tailrec
 import scala.collection.{SeqView, mutable}
-import scala.util.{Failure, Success, Try}
 
 object Game {
   type Player = Int
@@ -74,7 +73,7 @@ object Game {
       from <- shuffle(findPiecesCoords(state.grid).getOrElse(state.nextPlayer, Nil)).view
       dir <- shuffle(Direction.values.toSeq).view
       action = Action(from, dir)
-      maybeResState = playAction(action, state).toOption
+      maybeResState = playAction(action, state)
       resState <- maybeResState if maybeResState.isDefined
     } yield action -> resState
   }
@@ -95,7 +94,7 @@ object Game {
       } else {
         val (from, dir) = allCombinations.dequeue()
         val action = Action(from, dir)
-        playAction(action, state).toOption match {
+        playAction(action, state) match {
           case Some(s) => found = (action -> s)
           case None    => ()
         }
@@ -105,29 +104,29 @@ object Game {
     Option(found)
   }
 
-  def playAction(action: Action, state: State): Try[State] = {
+  def playAction(action: Action, state: State): Option[State] = {
     val offset = toOffset(action.direction)
     val destCoord = add(action.from, offset)
 
     if (!isInGrid(destCoord)) {
-      Failure(new RuntimeException("Invalid coord outside of grid"))
+      None
     } else {
       val target1 = state.grid(destCoord.y)(destCoord.x)
       if (target1 != 0) {
         val destCoord2 = add(destCoord, offset)
         if (!isInGrid(destCoord2)) {
-          Failure(new RuntimeException("Invalid coord outside of grid"))
+          None
         } else if (target1 == state.nextPlayer) {
-          Failure(new RuntimeException("Cannot jump same player"))
+          None
         } else if (state.grid(destCoord2.y)(destCoord2.x) != 0) {
-          Failure(new RuntimeException("Invalid coord already occupied"))
+          None
         } else {
           val resGrid2 = jump(state.grid, action.from, destCoord, destCoord2, state.nextPlayer)
-          Success(State(resGrid2, nextPlayer(state.nextPlayer), winner(resGrid2)))
+          Some(State(resGrid2, nextPlayer(state.nextPlayer), winner(resGrid2)))
         }
       } else {
         val resGrid = move(state.grid, action.from, destCoord, state.nextPlayer)
-        Success(State(resGrid, nextPlayer(state.nextPlayer), state.winner))
+        Some(State(resGrid, nextPlayer(state.nextPlayer), state.winner))
       }
     }
   }
