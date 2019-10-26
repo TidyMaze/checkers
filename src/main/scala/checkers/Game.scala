@@ -3,7 +3,7 @@ package checkers
 import java.util.concurrent.atomic.AtomicInteger
 
 import checkers.Coord.add
-import checkers.Direction.toOffset
+import checkers.Direction.{Direction, toOffset}
 import checkers.Grid.{Grid, HEIGHT, WIDTH, update2D}
 import checkers.Player.nextPlayer
 import checkers.RandomHelpers._
@@ -70,8 +70,8 @@ object Game {
 
   def findAllActions(state: State): SeqView[(Action, State), Seq[_]] = {
     for {
-      from <- shuffle(findPiecesCoords(state.grid).getOrElse(state.nextPlayer, Nil)).view
-      dir <- shuffle(Direction.values.toSeq).view
+      from <- RandomHelpers.random.shuffle(findPiecesCoords(state.grid).getOrElse(state.nextPlayer, Nil)).view
+      dir <- RandomHelpers.random.shuffle(Direction.values.toSeq).view
       action = Action(from, dir)
       maybeResState = playAction(action, state)
       resState <- maybeResState if maybeResState.isDefined
@@ -81,10 +81,13 @@ object Game {
   def findOneRandomAction(state: State): Option[(Action, State)] = {
     val coords = findPiecesCoords(state.grid).getOrElse(state.nextPlayer, Nil)
 
-    val allCombinations = shuffle(for {
-      c <- coords
-      d <- Direction.values.toSeq
-    } yield (c -> d)).to[mutable.Queue]
+    var allCombinations = new mutable.Queue[(Coord, Direction)]()
+    coords.foreach(c =>
+      Direction.values.foreach(d =>
+        allCombinations.enqueue((c, d))
+      )
+    )
+    allCombinations = RandomHelpers.random.shuffle(allCombinations)
 
     var found: (Action, State) = null
     var over = false
@@ -95,7 +98,7 @@ object Game {
         val (from, dir) = allCombinations.dequeue()
         val action = Action(from, dir)
         playAction(action, state) match {
-          case Some(s) => found = (action -> s)
+          case Some(s) => found = (action, s)
           case None    => ()
         }
       }

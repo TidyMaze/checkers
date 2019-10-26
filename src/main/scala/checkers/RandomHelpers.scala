@@ -11,5 +11,4 @@ object RandomHelpers {
 
   def randPct(): Double = random.nextDouble()
 
-  def shuffle[A](arr: Seq[A]) = random.shuffle(arr)
 }
