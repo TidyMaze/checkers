@@ -9,7 +9,7 @@ import checkers.Player.nextPlayer
 import checkers.RandomHelpers._
 
 import scala.annotation.tailrec
-import scala.collection.SeqView
+import scala.collection.{SeqView, mutable}
 import scala.util.{Failure, Success, Try}
 
 object Game {
@@ -81,15 +81,28 @@ object Game {
 
   def findOneRandomAction(state: State): Option[(Action, State)] = {
     val coords = findPiecesCoords(state.grid).getOrElse(state.nextPlayer, Nil)
-    if(coords.isEmpty){
-      None
-    } else {
-      val from = randomIn(coords).get
-      val dir = randomIn(Direction.values.toSeq).get
-      val action = Action(from, dir)
-      val maybeResState = playAction(action, state).toOption
-      maybeResState.map(s => action -> s)
+
+    val allCombinations = shuffle(for {
+      c <- coords
+      d <- Direction.values.toSeq
+    } yield (c -> d)).to[mutable.Queue]
+
+    var found: (Action, State) = null
+    var over = false
+    while(!over && found == null){
+      if(allCombinations.isEmpty){
+        over = true
+      } else {
+        val (from, dir) = allCombinations.dequeue()
+        val action = Action(from, dir)
+        playAction(action, state).toOption match {
+          case Some(s) => found = (action -> s)
+          case None    => ()
+        }
+      }
     }
+
+    Option(found)
   }
 
   def playAction(action: Action, state: State): Try[State] = {
