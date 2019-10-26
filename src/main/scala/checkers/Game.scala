@@ -55,7 +55,7 @@ object Game {
   def playTillEndWithEvalFunctionNoHistory(state: State, eval: (State, Player) => Double, onTurn: State => Unit = _ => (), count: AtomicInteger): State = {
     @tailrec
     def aux(s: State): State = {
-      val actions = findAllActions(s)
+      val actions = findOneRandomAction(s)
       if (actions.isEmpty) {
         s
       } else {
@@ -77,6 +77,19 @@ object Game {
       maybeResState = playAction(action, state).toOption
       resState <- maybeResState if maybeResState.isDefined
     } yield action -> resState
+  }
+
+  def findOneRandomAction(state: State): Option[(Action, State)] = {
+    val coords = findPiecesCoords(state.grid).getOrElse(state.nextPlayer, Nil)
+    if(coords.isEmpty){
+      None
+    } else {
+      val from = randomIn(coords).get
+      val dir = randomIn(Direction.values.toSeq).get
+      val action = Action(from, dir)
+      val maybeResState = playAction(action, state).toOption
+      maybeResState.map(s => action -> s)
+    }
   }
 
   def playAction(action: Action, state: State): Try[State] = {
