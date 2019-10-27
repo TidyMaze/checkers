@@ -9,8 +9,9 @@ import checkers.Player.nextPlayer
 import checkers.RandomHelpers._
 
 import scala.annotation.tailrec
+import scala.collection.immutable.Seq
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
-import scala.collection.{SeqView, mutable}
 
 object Game {
   type Player = Int
@@ -66,10 +67,10 @@ object Game {
     aux(state)
   }
 
-  def findAllActions(state: State): SeqView[(Action, State), Seq[_]] = {
+  def findAllActions(state: State): Seq[(Action, State)] = {
     for {
-      from <- RandomHelpers.random.shuffle(state.playersPieces.getOrElse(state.nextPlayer, Nil)).view
-      dir <- RandomHelpers.random.shuffle(Direction.values.toSeq).view
+      from <- RandomHelpers.random.shuffle(state.playersPieces.getOrElse(state.nextPlayer, Seq.empty))
+      dir <- RandomHelpers.random.shuffle(Direction.values.to[Seq])
       action = Action(from, dir)
       maybeResState = playAction(action, state)
       resState <- maybeResState if maybeResState.isDefined
@@ -152,14 +153,14 @@ object Game {
   def eat(grid: Grid, coord: Coord): Grid = update2D(grid, coord, 0)
 
   def findPiecesCoords(grid: Grid): Map[Player, Seq[Coord]] = {
-    var res = new mutable.HashMap[Player, mutable.Seq[Coord]]()
+    var res = new mutable.HashMap[Player, Seq[Coord]]()
     var y = 0
     while(y < HEIGHT){
       var x = 0
       while(x < WIDTH){
         val cell = grid(y)(x)
         if(cell != 0){
-          val curCoords = res.getOrElseUpdate(cell, mutable.Seq.empty)
+          val curCoords = res.getOrElseUpdate(cell, Seq.empty)
           res.put(cell, curCoords :+ Coord(x,y))
         }
         x += 1

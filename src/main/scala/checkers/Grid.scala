@@ -1,5 +1,7 @@
 package checkers
 
+import scala.collection.immutable.Seq
+
 object Grid {
   type Grid = Seq[Seq[Int]]
 
