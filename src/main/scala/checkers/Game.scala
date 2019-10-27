@@ -153,15 +153,14 @@ object Game {
   def eat(grid: Grid, coord: Coord): Grid = update2D(grid, coord, 0)
 
   def findPiecesCoords(grid: Grid): Map[Player, Seq[Coord]] = {
-    var res = new mutable.HashMap[Player, Seq[Coord]]()
+    var res = new mutable.HashMap[Player, List[Coord]]()
     var y = 0
     while(y < HEIGHT){
       var x = 0
       while(x < WIDTH){
         val cell = grid(y)(x)
         if(cell != 0){
-          val curCoords = res.getOrElseUpdate(cell, Seq.empty)
-          res.put(cell, curCoords :+ Coord(x,y))
+          res.put(cell, Coord(x,y) :: res.getOrElseUpdate(cell, Nil))
         }
         x += 1
       }
