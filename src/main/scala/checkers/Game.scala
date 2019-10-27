@@ -9,6 +9,7 @@ import checkers.Player.nextPlayer
 import checkers.RandomHelpers._
 
 import scala.annotation.tailrec
+import scala.collection.mutable.ArrayBuffer
 import scala.collection.{SeqView, mutable}
 
 object Game {
@@ -81,13 +82,13 @@ object Game {
   def findOneRandomAction(state: State): Option[(Action, State)] = {
     val coords = findPiecesCoords(state.grid).getOrElse(state.nextPlayer, Nil)
 
-    var allCombinations = new mutable.Queue[(Coord, Direction)]()
+    var allCombinations = new ArrayBuffer[(Coord, Direction)](coords.size * Direction.values.size)
     coords.foreach(c =>
       Direction.values.foreach(d =>
-        allCombinations.enqueue((c, d))
+        allCombinations.append((c, d))
       )
     )
-    allCombinations = RandomHelpers.random.shuffle(allCombinations)
+    RandomHelpers.shuffle(allCombinations)
 
     var found: (Action, State) = null
     var over = false
@@ -95,7 +96,8 @@ object Game {
       if(allCombinations.isEmpty){
         over = true
       } else {
-        val (from, dir) = allCombinations.dequeue()
+        val (from, dir) = allCombinations.last
+        allCombinations.reduceToSize(allCombinations.size - 1)
         val action = Action(from, dir)
         playAction(action, state) match {
           case Some(s) => found = (action, s)
