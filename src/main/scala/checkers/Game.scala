@@ -160,7 +160,7 @@ object Game {
       while(x < WIDTH){
         val cell = grid(y)(x)
         if(cell != 0){
-          res.put(cell, Coord(x,y) :: res.getOrElseUpdate(cell, Nil))
+          res.put(cell, Coord(x,y) :: res.getOrElse(cell, Nil))
         }
         x += 1
       }
