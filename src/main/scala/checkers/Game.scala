@@ -16,15 +16,12 @@ object Game {
   type Player = Int
 
   def newGame(): State = {
-    State(
-      Grid.initPattern.map(line => line.map {
-        case '-' => 0
-        case '1' => 1
-        case '2' => 2
-      }),
-      1,
-      None
-    )
+    val grid = Grid.initPattern.map(line => line.map {
+      case '-' => 0
+      case '1' => 1
+      case '2' => 2
+    })
+    State(grid, 1, findPiecesCoords(grid), None)
   }
 
   def playTillEndRandomlyNoHistory(state: State, onTurn: State => Unit, count: AtomicInteger): State =
@@ -71,7 +68,7 @@ object Game {
 
   def findAllActions(state: State): SeqView[(Action, State), Seq[_]] = {
     for {
-      from <- RandomHelpers.random.shuffle(findPiecesCoords(state.grid).getOrElse(state.nextPlayer, Nil)).view
+      from <- RandomHelpers.random.shuffle(state.playersPieces.getOrElse(state.nextPlayer, Nil)).view
       dir <- RandomHelpers.random.shuffle(Direction.values.toSeq).view
       action = Action(from, dir)
       maybeResState = playAction(action, state)
@@ -80,7 +77,7 @@ object Game {
   }
 
   def findOneRandomAction(state: State): Option[(Action, State)] = {
-    val coords = findPiecesCoords(state.grid).getOrElse(state.nextPlayer, Nil)
+    val coords = state.playersPieces.getOrElse(state.nextPlayer, Nil)
 
     var allCombinations = new ArrayBuffer[(Coord, Direction)](coords.size * Direction.values.size)
     coords.foreach(c =>
@@ -127,21 +124,22 @@ object Game {
           None
         } else {
           val resGrid2 = jump(state.grid, action.from, destCoord, destCoord2, state.nextPlayer)
-          Some(State(resGrid2, nextPlayer(state.nextPlayer), winner(resGrid2)))
+          val pieces = findPiecesCoords(resGrid2)
+          Some(State(resGrid2, nextPlayer(state.nextPlayer), pieces, winner(pieces)))
         }
       } else {
         val resGrid = move(state.grid, action.from, destCoord, state.nextPlayer)
-        Some(State(resGrid, nextPlayer(state.nextPlayer), state.winner))
+        val pieces = findPiecesCoords(resGrid)
+        Some(State(resGrid, nextPlayer(state.nextPlayer), pieces, state.winner))
       }
     }
   }
 
   def isInGrid(coord: Coord): Boolean = coord.y >= 0 && coord.x >= 0 && coord.y < HEIGHT && coord.x < WIDTH
 
-  def winner(grid: Grid): Option[Player] = {
-    val playersPieces = findPiecesCoords(grid)
-    if (!playersPieces.isDefinedAt(1)) Some(2)
-    else if (!playersPieces.isDefinedAt(2)) Some(1)
+  def winner(pieces: Map[Int, Seq[Coord]]): Option[Player] = {
+    if (!pieces.isDefinedAt(1)) Some(2)
+    else if (!pieces.isDefinedAt(2)) Some(1)
     else None
   }
 
