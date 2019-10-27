@@ -86,16 +86,16 @@ object Game {
         allCombinations.append((c, d))
       )
     )
-    RandomHelpers.shuffle(allCombinations)
+
+    val combinationsRandomIterator = RandomHelpers.randomIterator(allCombinations)
 
     var found: (Action, State) = null
     var over = false
     while(!over && found == null){
-      if(allCombinations.isEmpty){
+      if(!combinationsRandomIterator.hasNext){
         over = true
       } else {
-        val (from, dir) = allCombinations.last
-        allCombinations.reduceToSize(allCombinations.size - 1)
+        val (from, dir) = combinationsRandomIterator.next()
         val action = Action(from, dir)
         playAction(action, state) match {
           case Some(s) => found = (action, s)

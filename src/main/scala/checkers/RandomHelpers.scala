@@ -1,5 +1,6 @@
 package checkers
 
+import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.{Failure, Random, Success, Try}
 
@@ -12,17 +13,17 @@ object RandomHelpers {
 
   def randPct(): Double = random.nextDouble()
 
-  def shuffle[A](xs: ArrayBuffer[A]): Unit = {
-    def swap(i1: Int, i2: Int) {
-      val tmp = xs(i1)
-      xs(i1) = xs(i2)
-      xs(i2) = tmp
-    }
+  def randomIterator[A](xs: ArrayBuffer[A]): Iterator[A] = new RandomIterator[A](xs, random)
+}
 
-    for (n <- xs.length to 2 by -1) {
-      val k = random.nextInt(n)
-      swap(n - 1, k)
-    }
+class RandomIterator[A](xs: ArrayBuffer[A], random: Random) extends Iterator[A] {
+  private  val remainings = xs.indices.to[mutable.HashSet]
+
+  override def hasNext: Boolean = remainings.nonEmpty
+
+  override def next(): A = {
+    val picked =  remainings.iterator.drop(random.nextInt(remainings.size)).next()
+    remainings.remove(picked)
+    xs(picked)
   }
-
 }
