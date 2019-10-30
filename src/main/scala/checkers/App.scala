@@ -1,5 +1,6 @@
 package checkers
 
+import java.io.{File, FileWriter, PrintWriter}
 import java.util.concurrent.atomic.AtomicInteger
 
 import checkers.Game._
@@ -36,7 +37,13 @@ object App extends App {
     println(currentState)
   }
 
-  val states = playTillEndWithEvalFunction(state, monteCarloEvalFunctionWithStore(500), turnHandler)
+
+
+  val file = new File("./out/dump.txt")
+  file.getParentFile.mkdirs()
+  val fw = new FileWriter(file, false)
+
+  val states = playTillEndWithEvalFunction(state, monteCarloEvalFunctionWithStore(100), turnHandler)
   println(s"after ${states.size} turns")
   states.foreach { s =>
     println(s)
@@ -48,9 +55,16 @@ object App extends App {
 
   println(s"${store.size} samples")
 
-  store.map {
-    case (state, score) => transformToEploitable(state, score)
-  }.sortBy(_._2).foreach {
-    case (state, score) => println(state.grid.map(_.mkString(" ")).mkString(" ") + " " + score)
+  val pw = new PrintWriter(fw)
+
+  try {
+    store.map {
+      case (state, score) => transformToEploitable(state, score)
+    }.sortBy(_._2).foreach {
+      case (state, score) => pw.println(state.grid.map(_.mkString(" ")).mkString(" ") + " " + score)
+    }
+  } finally {
+    pw.close()
   }
+
 }
