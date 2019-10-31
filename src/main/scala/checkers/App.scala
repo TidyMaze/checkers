@@ -10,9 +10,9 @@ import scala.collection.mutable.ListBuffer
 
 object App extends App {
 
-  val store: ListBuffer[(State, Double)] = ListBuffer[(State, Double)]()
+  val store: ListBuffer[ScoredState] = ListBuffer[ScoredState]()
 
-  def transformToEploitable(state: State, score: Double): (State, Double) = {
+  def transformToEploitable(scoredState: ScoredState): ScoredState = {
     val theCurrentPlayer = Player.nextPlayer(state.nextPlayer)
     val opp = state.nextPlayer
     val transformedGrid = state.grid.map(line => line.map {
@@ -20,12 +20,12 @@ object App extends App {
       case `opp` => -1
       case _ => 0
     })
-    (state.copy(grid = transformedGrid), score)
+    ScoredState(state.copy(grid = transformedGrid), scoredState.score)
   }
 
   def monteCarloEvalFunctionWithStore(samples: Int)(state: State, player: Player, count: AtomicInteger): Double = {
     val score = monteCarloEvalFunction(samples)(state, player, count)
-    store += ((state, score))
+    store += ScoredState(state, score)
     score
   }
 
@@ -36,7 +36,6 @@ object App extends App {
     println(s"Playing $action with expected winrate $score for player ${Player.nextPlayer(currentState.nextPlayer)}")
     println(currentState)
   }
-
 
 
   val file = new File("./out/dump.txt")
@@ -58,13 +57,14 @@ object App extends App {
   val pw = new PrintWriter(fw)
 
   try {
-    store.map {
-      case (state, score) => transformToEploitable(state, score)
-    }.sortBy(_._2).foreach {
-      case (state, score) => pw.println(state.grid.map(_.mkString(" ")).mkString(" ") + " " + score)
-    }
+    store.map(transformToEploitable)
+      .sortBy {
+        _.score
+      }
+      .foreach { scoredState =>
+        pw.println(scoredState.state.grid.map(_.mkString(" ")).mkString(" ") + " " + scoredState.score)
+      }
   } finally {
     pw.close()
   }
-
 }
