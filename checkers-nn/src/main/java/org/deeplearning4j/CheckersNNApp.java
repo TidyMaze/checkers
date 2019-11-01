@@ -32,6 +32,9 @@ import org.deeplearning4j.nn.weights.WeightInit;
 import org.deeplearning4j.optimize.listeners.ScoreIterationListener;
 import org.nd4j.evaluation.regression.RegressionEvaluation;
 import org.nd4j.linalg.activations.Activation;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.dataset.SplitTestAndTrain;
+import org.nd4j.linalg.dataset.DataSet;
 import org.nd4j.linalg.dataset.api.iterator.DataSetIterator;
 import org.nd4j.linalg.dataset.api.preprocessor.DataNormalization;
 import org.nd4j.linalg.dataset.api.preprocessor.NormalizerStandardize;
@@ -49,7 +52,7 @@ public class CheckersNNApp {
     private static final Logger log = LoggerFactory.getLogger(CheckersNNApp.class);
 
     public static void main(String[] args) throws Exception {
-        int nEpochs = 50; // Number of training epochs
+        int nEpochs = 2000; // Number of training epochs
         int seed = 123; //
 
         /*
@@ -59,15 +62,19 @@ public class CheckersNNApp {
         RecordReader rr = new CSVRecordReader(0, ',');
         rr.initialize(new FileSplit(new File("in/dump.txt")));
 
-        RecordReaderDataSetIterator recordReaderDataSetIterator = new RecordReaderDataSetIterator(rr, 10, 64, 64, true);
+        RecordReaderDataSetIterator recordReaderDataSetIterator = new RecordReaderDataSetIterator(rr, 100, 64, 64, true);
+        DataSet allData = recordReaderDataSetIterator.next();
+        allData.shuffle();
+
+        SplitTestAndTrain testAndTrain = allData.splitTestAndTrain(0.80);
+
+        org.nd4j.linalg.dataset.DataSet trainingData = testAndTrain.getTrain();
+        org.nd4j.linalg.dataset.DataSet testData = testAndTrain.getTest();
+
         DataNormalization dataNormalization = new NormalizerStandardize();
-        dataNormalization.fit(recordReaderDataSetIterator);
-        recordReaderDataSetIterator.setPreProcessor(dataNormalization);
-
-        DataSetIteratorSplitter recordReaderDataSetSplittedIterator = new DataSetIteratorSplitter(recordReaderDataSetIterator, 1000, 0.75);
-
-        DataSetIterator trainDataSet = recordReaderDataSetSplittedIterator.getTrainIterator();
-        DataSetIterator testDataSet = recordReaderDataSetSplittedIterator.getTestIterator();
+        dataNormalization.fit(trainingData);
+        dataNormalization.transform(trainingData);
+        dataNormalization.transform(testData);
 
         /*
             Construct the neural network
@@ -103,15 +110,16 @@ public class CheckersNNApp {
 
 
         log.info("Train model....");
-        model.setListeners(new ScoreIterationListener(1)); //Print score every 10 iterations
+        model.setListeners(new ScoreIterationListener(10)); //Print score every 10 iterations
         for( int i=0; i<nEpochs; i++ ) {
-            model.fit(trainDataSet);
+            model.fit(trainingData);
             log.info("*** Completed epoch {} ***", i);
 
             log.info("Evaluate model....");
-            RegressionEvaluation eval = model.evaluateRegression(testDataSet);
+            RegressionEvaluation eval = new RegressionEvaluation();
+            INDArray output = model.output(testData.getFeatures());
+            eval.eval(testData.getLabels(), output);
             log.info(eval.stats());
-            testDataSet.reset();
         }
         log.info("****************Example finished********************");
     }
