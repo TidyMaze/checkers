@@ -53,7 +53,7 @@ public class CheckersNNApp {
     private static final Logger log = LoggerFactory.getLogger(CheckersNNApp.class);
 
     public static void main(String[] args) throws Exception {
-        int nEpochs = 5000; // Number of training epochs
+        int nEpochs = 1000; // Number of training epochs
         int seed = 123; //
 
         /*
@@ -90,9 +90,10 @@ public class CheckersNNApp {
                 .list()
                 .layer(0, new DenseLayer.Builder().nIn(64).nOut(32).activation(Activation.LEAKYRELU).build())
                 .layer(1, new DenseLayer.Builder().nIn(32).nOut(32).activation(Activation.LEAKYRELU).build())
-                .layer(2, new DenseLayer.Builder().nIn(32).nOut(32).activation(Activation.LEAKYRELU).build())
-                .layer(3, new DenseLayer.Builder().nIn(32).nOut(32).activation(Activation.LEAKYRELU).build())
-                .layer(4, new OutputLayer.Builder(LossFunctions.LossFunction.SQUARED_LOSS).nIn(32).nOut(1).activation(Activation.IDENTITY).build())
+                .layer(2, new DenseLayer.Builder().nIn(32).nOut(16).activation(Activation.LEAKYRELU).build())
+                .layer(3, new DenseLayer.Builder().nIn(16).nOut(8).activation(Activation.LEAKYRELU).build())
+                .layer(4, new DenseLayer.Builder().nIn(8).nOut(4).activation(Activation.LEAKYRELU).build())
+                .layer(5, new OutputLayer.Builder(LossFunctions.LossFunction.SQUARED_LOSS).nIn(4).nOut(1).activation(Activation.IDENTITY).build())
                 .backpropType(BackpropType.Standard)
                 .build();
 
