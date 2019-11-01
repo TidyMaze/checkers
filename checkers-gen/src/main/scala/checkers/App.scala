@@ -36,34 +36,42 @@ object App extends App {
   }
 
 
-  val file = new File("./out/dump.txt")
+  val file = new File("../out/dump.txt")
   file.getParentFile.mkdirs()
-  val fw = new FileWriter(file, false)
-
-  val states = playTillEndWithEvalFunction(Game.newGame(), monteCarloEvalFunctionWithStore(100), turnHandler)
-  println(s"after ${states.size} turns")
-  states.foreach { s =>
-    println(s)
-    println()
-  }
-
-  val endGameWinner: Option[String] = states.lastOption.flatMap(_.winner.map(_.toString))
-  println(s"winner is ${endGameWinner.getOrElse("nobody")}")
-
-  println(s"${store.size} samples")
+  val fw = new FileWriter(file, true)
 
   val pw = new PrintWriter(fw)
-
   try {
-    store.map(transformToEploitable)
-      .sortBy {
-        _.score
-      }
-      .foreach { scoredState =>
-        val linearGrid = scoredState.state.grid.flatten.map(_.toString)
-        pw.println((linearGrid :+ scoredState.score.toString).mkString(","))
-      }
+
+    (0 until 10).foreach { _ =>
+      store.clear()
+      val states = playTillEndWithEvalFunction(Game.newGame(), monteCarloEvalFunctionWithStore(1000), turnHandler)
+
+//      endGamePrint(states)
+
+      println(s"${store.size} samples")
+
+      store.map(transformToEploitable)
+        .sortBy {
+          _.score
+        }
+        .foreach { scoredState =>
+          val linearGrid = scoredState.state.grid.flatten.map(_.toString)
+          pw.println((linearGrid :+ scoredState.score.toString).mkString(","))
+        }
+    }
   } finally {
     pw.close()
+  }
+
+  private def endGamePrint(states: List[State]) = {
+    println(s"after ${states.size} turns")
+    states.foreach { s =>
+      println(s)
+      println()
+    }
+
+    val endGameWinner: Option[String] = states.lastOption.flatMap(_.winner.map(_.toString))
+    println(s"winner is ${endGameWinner.getOrElse("nobody")}")
   }
 }

@@ -61,7 +61,7 @@ public class CheckersNNApp {
          */
         log.info("Load data....");
         RecordReader rr = new CSVRecordReader(0, ',');
-        rr.initialize(new FileSplit(new File("in/dump.txt")));
+        rr.initialize(new FileSplit(new File("../out/dump.txt")));
 
         RecordReaderDataSetIterator recordReaderDataSetIterator = new RecordReaderDataSetIterator(rr, 500, 64, 64, true);
         DataSet allData = recordReaderDataSetIterator.next();
@@ -84,7 +84,7 @@ public class CheckersNNApp {
 
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(seed)
-                .l2(0.0005)
+                .l2(0.001)
                 .weightInit(WeightInit.XAVIER)
                 .updater(new Adam(0.001))
                 .list()
