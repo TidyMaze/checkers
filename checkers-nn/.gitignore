@@ -1,3 +1,4 @@
 /target/classes/org/deeplearning4j/
 /logs/application.log
 /target/classes/
+.idea
