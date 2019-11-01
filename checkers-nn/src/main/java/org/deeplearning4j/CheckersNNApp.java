@@ -63,7 +63,7 @@ public class CheckersNNApp {
         RecordReader rr = new CSVRecordReader(0, ',');
         rr.initialize(new FileSplit(new File("../out/dump.txt")));
 
-        RecordReaderDataSetIterator recordReaderDataSetIterator = new RecordReaderDataSetIterator(rr, 500, 64, 64, true);
+        RecordReaderDataSetIterator recordReaderDataSetIterator = new RecordReaderDataSetIterator(rr, 100, 64, 64, true);
         DataSet allData = recordReaderDataSetIterator.next();
         allData.shuffle();
 
@@ -90,7 +90,9 @@ public class CheckersNNApp {
                 .list()
                 .layer(0, new DenseLayer.Builder().nIn(64).nOut(32).activation(Activation.LEAKYRELU).build())
                 .layer(1, new DenseLayer.Builder().nIn(32).nOut(32).activation(Activation.LEAKYRELU).build())
-                .layer(2, new OutputLayer.Builder(LossFunctions.LossFunction.SQUARED_LOSS).nIn(32).nOut(1).activation(Activation.IDENTITY).build())
+                .layer(2, new DenseLayer.Builder().nIn(32).nOut(32).activation(Activation.LEAKYRELU).build())
+                .layer(3, new DenseLayer.Builder().nIn(32).nOut(32).activation(Activation.LEAKYRELU).build())
+                .layer(4, new OutputLayer.Builder(LossFunctions.LossFunction.SQUARED_LOSS).nIn(32).nOut(1).activation(Activation.IDENTITY).build())
                 .backpropType(BackpropType.Standard)
                 .build();
 
