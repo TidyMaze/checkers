@@ -53,7 +53,7 @@ public class CheckersNNApp {
     private static final Logger log = LoggerFactory.getLogger(CheckersNNApp.class);
 
     public static void main(String[] args) throws Exception {
-        int nEpochs = 2000; // Number of training epochs
+        int nEpochs = 5000; // Number of training epochs
         int seed = 123; //
 
         /*
@@ -86,23 +86,12 @@ public class CheckersNNApp {
                 .seed(seed)
                 .l2(0.0005)
                 .weightInit(WeightInit.XAVIER)
-                .updater(new Adam(0.01))
+                .activation(Activation.RELU)
+                .updater(new Adam(0.001))
                 .list()
-                .layer(0, new DenseLayer.Builder()
-                        .activation(Activation.IDENTITY)
-                        .nIn(64)
-                        .nOut(32)
-                        .build())
-                .layer(1, new DenseLayer.Builder()
-                        .nIn(32)
-                        .nOut(16)
-                        .activation(Activation.RELU)
-                        .build())
-                .layer(2, new OutputLayer.Builder(LossFunctions.LossFunction.SQUARED_LOSS)
-                        .nIn(16)
-                        .nOut(1)
-                        .activation(Activation.IDENTITY)
-                        .build())
+                .layer(0, new DenseLayer.Builder().nIn(64).nOut(32).activation(Activation.RELU).build())
+                .layer(1, new DenseLayer.Builder().nIn(32).nOut(16).activation(Activation.RELU).build())
+                .layer(2, new OutputLayer.Builder(LossFunctions.LossFunction.SQUARED_LOSS).nIn(16).nOut(1).activation(Activation.IDENTITY).build())
                 .backpropType(BackpropType.Standard)
                 .build();
 
@@ -125,7 +114,16 @@ public class CheckersNNApp {
 
 
         // Test the evaluation of a state
-        final INDArray input = Nd4j.create(new double[] { 0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,1,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0 }, 1, 64);
+        final INDArray input = Nd4j.create(new double[] {
+                0,0,0,0,0,1,0,0,
+                1,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,1,
+                1,0,1,0,0,0,0,0,
+                0,0,0,0,0,-1,0,0,
+                0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,0,0,
+                0,0,0,0,0,0,1,0
+        }, 1, 64);
         INDArray out = model.output(input, false);
         System.out.println("predicted score " + out);
     }
