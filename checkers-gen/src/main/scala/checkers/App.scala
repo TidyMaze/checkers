@@ -13,14 +13,14 @@ object App extends App {
   val store: ListBuffer[ScoredState] = ListBuffer[ScoredState]()
 
   def transformToEploitable(scoredState: ScoredState): ScoredState = {
-    val theCurrentPlayer = Player.nextPlayer(state.nextPlayer)
-    val opp = state.nextPlayer
-    val transformedGrid = state.grid.map(line => line.map {
+    val theCurrentPlayer = Player.nextPlayer(scoredState.state.nextPlayer)
+    val opp = scoredState.state.nextPlayer
+    val transformedGrid = scoredState.state.grid.map(line => line.map {
       case `theCurrentPlayer` => 1
       case `opp` => -1
       case _ => 0
     })
-    ScoredState(state.copy(grid = transformedGrid), scoredState.score)
+    ScoredState(scoredState.state.copy(grid = transformedGrid), scoredState.score)
   }
 
   def monteCarloEvalFunctionWithStore(samples: Int)(state: State, player: Player, count: AtomicInteger): Double = {
@@ -28,8 +28,6 @@ object App extends App {
     store += ScoredState(state, score)
     score
   }
-
-  val state: State = Game.newGame()
 
   val turnHandler: (Action, State, Double) => Unit = (action, currentState, score) => {
     println()
@@ -42,7 +40,7 @@ object App extends App {
   file.getParentFile.mkdirs()
   val fw = new FileWriter(file, false)
 
-  val states = playTillEndWithEvalFunction(state, monteCarloEvalFunctionWithStore(100), turnHandler)
+  val states = playTillEndWithEvalFunction(Game.newGame(), monteCarloEvalFunctionWithStore(100), turnHandler)
   println(s"after ${states.size} turns")
   states.foreach { s =>
     println(s)
@@ -62,7 +60,8 @@ object App extends App {
         _.score
       }
       .foreach { scoredState =>
-        pw.println(scoredState.state.grid.map(_.mkString(" ")).mkString(" ") + " " + scoredState.score)
+        val linearGrid = scoredState.state.grid.flatten.map(_.toString)
+        pw.println((linearGrid :+ scoredState.score.toString).mkString(","))
       }
   } finally {
     pw.close()
