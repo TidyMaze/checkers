@@ -63,11 +63,11 @@ public class CheckersNNApp {
         RecordReader rr = new CSVRecordReader(0, ',');
         rr.initialize(new FileSplit(new File("in/dump.txt")));
 
-        RecordReaderDataSetIterator recordReaderDataSetIterator = new RecordReaderDataSetIterator(rr, 100, 64, 64, true);
+        RecordReaderDataSetIterator recordReaderDataSetIterator = new RecordReaderDataSetIterator(rr, 500, 64, 64, true);
         DataSet allData = recordReaderDataSetIterator.next();
         allData.shuffle();
 
-        SplitTestAndTrain testAndTrain = allData.splitTestAndTrain(0.80);
+        SplitTestAndTrain testAndTrain = allData.splitTestAndTrain(0.90);
 
         org.nd4j.linalg.dataset.DataSet trainingData = testAndTrain.getTrain();
         org.nd4j.linalg.dataset.DataSet testData = testAndTrain.getTest();
@@ -86,12 +86,11 @@ public class CheckersNNApp {
                 .seed(seed)
                 .l2(0.0005)
                 .weightInit(WeightInit.XAVIER)
-                .activation(Activation.RELU)
                 .updater(new Adam(0.001))
                 .list()
-                .layer(0, new DenseLayer.Builder().nIn(64).nOut(32).activation(Activation.RELU).build())
-                .layer(1, new DenseLayer.Builder().nIn(32).nOut(16).activation(Activation.RELU).build())
-                .layer(2, new OutputLayer.Builder(LossFunctions.LossFunction.SQUARED_LOSS).nIn(16).nOut(1).activation(Activation.IDENTITY).build())
+                .layer(0, new DenseLayer.Builder().nIn(64).nOut(32).activation(Activation.LEAKYRELU).build())
+                .layer(1, new DenseLayer.Builder().nIn(32).nOut(32).activation(Activation.LEAKYRELU).build())
+                .layer(2, new OutputLayer.Builder(LossFunctions.LossFunction.SQUARED_LOSS).nIn(32).nOut(1).activation(Activation.IDENTITY).build())
                 .backpropType(BackpropType.Standard)
                 .build();
 
