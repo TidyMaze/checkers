@@ -21,9 +21,9 @@
     <modelVersion>4.0.0</modelVersion>
 
     <!-- Group-ID, artifact ID and version of the project. You can modify these as you want -->
-    <groupId>org.deeplearning4j</groupId>
-    <artifactId>deeplearning4j-examples</artifactId>
-    <version>1.0.0-beta5</version>
+    <groupId>com.yaro</groupId>
+    <artifactId>checkers-nn</artifactId>
+    <version>0.0.0</version>
 
     <!-- Properties Section. Change DL4J and ND4J versions here, if required -->
     <properties>
