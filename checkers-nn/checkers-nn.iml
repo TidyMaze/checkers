@@ -10,6 +10,11 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:mac:11" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:mac:11" level="project" />
+    <orderEntry type="library" name="Maven: org.nd4j:nd4j-native:macosx-x86_64:1.0.0-beta5" level="project" />
+    <orderEntry type="library" name="Maven: org.bytedeco:mkl:macosx-x86_64:2019.4-1.5.1" level="project" />
+    <orderEntry type="library" name="Maven: org.bytedeco:mkl-dnn:macosx-x86_64:0.20-1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.deeplearning4j:deeplearning4j-core:1.0.0-beta5" level="project" />
     <orderEntry type="library" name="Maven: org.deeplearning4j:deeplearning4j-tsne:1.0.0-beta5" level="project" />
     <orderEntry type="library" name="Maven: org.deeplearning4j:nearestneighbor-core:1.0.0-beta5" level="project" />
@@ -86,9 +91,9 @@
     <orderEntry type="library" name="Maven: org.bytedeco:leptonica:1.78.0-1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:tesseract:4.1.0-1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:mac:11" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-graphics:win:11" level="project" />
     <orderEntry type="library" name="Maven: org.openjfx:javafx-base:11" level="project" />
-    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:mac:11" level="project" />
+    <orderEntry type="library" name="Maven: org.openjfx:javafx-base:win:11" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:opencv-platform:4.1.0-1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:openblas-platform:0.3.6-1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:openblas:android-arm:0.3.6-1.5.1" level="project" />
@@ -102,8 +107,8 @@
     <orderEntry type="library" name="Maven: org.bytedeco:openblas:linux-armhf:0.3.6-1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:openblas:linux-arm64:0.3.6-1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:openblas:linux-ppc64le:0.3.6-1.5.1" level="project" />
+    <orderEntry type="library" name="Maven: org.bytedeco:openblas:macosx-x86_64:0.3.6-1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:openblas:windows-x86:0.3.6-1.5.1" level="project" />
-    <orderEntry type="library" name="Maven: org.bytedeco:openblas:windows-x86_64:0.3.6-1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:opencv:android-arm:4.1.0-1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:opencv:android-arm64:4.1.0-1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:opencv:android-x86:4.1.0-1.5.1" level="project" />
@@ -133,14 +138,14 @@
     <orderEntry type="library" name="Maven: org.bytedeco:leptonica:windows-x86_64:1.78.0-1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.deeplearning4j:deeplearning4j-ui-components:1.0.0-beta5" level="project" />
     <orderEntry type="library" name="Maven: org.nd4j:nd4j-native:1.0.0-beta5" level="project" />
-    <orderEntry type="library" name="Maven: org.nd4j:nd4j-native:macosx-x86_64:1.0.0-beta5" level="project" />
+    <orderEntry type="library" name="Maven: org.nd4j:nd4j-native:windows-x86_64:1.0.0-beta5" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:javacpp:1.5.1-1" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:openblas:0.3.6-1.5.1" level="project" />
-    <orderEntry type="library" name="Maven: org.bytedeco:openblas:macosx-x86_64:0.3.6-1.5.1" level="project" />
+    <orderEntry type="library" name="Maven: org.bytedeco:openblas:windows-x86_64:0.3.6-1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:mkl:2019.4-1.5.1" level="project" />
-    <orderEntry type="library" name="Maven: org.bytedeco:mkl:macosx-x86_64:2019.4-1.5.1" level="project" />
+    <orderEntry type="library" name="Maven: org.bytedeco:mkl:windows-x86_64:2019.4-1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.bytedeco:mkl-dnn:0.20-1.5.1" level="project" />
-    <orderEntry type="library" name="Maven: org.bytedeco:mkl-dnn:macosx-x86_64:0.20-1.5.1" level="project" />
+    <orderEntry type="library" name="Maven: org.bytedeco:mkl-dnn:windows-x86_64:0.20-1.5.1" level="project" />
     <orderEntry type="library" name="Maven: org.nd4j:nd4j-native-api:1.0.0-beta5" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-classic:1.2.3" level="project" />
     <orderEntry type="library" name="Maven: ch.qos.logback:logback-core:1.2.3" level="project" />
