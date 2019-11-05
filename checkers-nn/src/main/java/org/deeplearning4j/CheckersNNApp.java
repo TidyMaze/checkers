@@ -88,7 +88,7 @@ public class CheckersNNApp {
 //                .dropOut(0.1)
 //                .l2(0.001)
                 .weightInit(WeightInit.XAVIER)
-                .updater(new Adam(0.2))
+                .updater(new Adam(0.01))
                 .list()
                 .layer(0, new DenseLayer.Builder().nIn(64).nOut(10).activation(Activation.TANH).build())
                 .layer(1, new DenseLayer.Builder().nIn(10).nOut(8).activation(Activation.TANH).build())
