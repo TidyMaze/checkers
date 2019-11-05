@@ -57,7 +57,7 @@ public class CheckersNNApp {
         File dataSetFile = new File("out/dump.txt");
 
         boolean loadExisting = true;
-        boolean train = true;
+        boolean train = false;
 
         MultiLayerNetwork model = null;
 
@@ -126,7 +126,18 @@ public class CheckersNNApp {
         final INDArray input = Nd4j.create(new double[]{
                 0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, -1, 0
         }, 1, 64); // expected Output: 0,7809; Desired output: 0,792;
+
+        long startTime = System.nanoTime();
+
         INDArray out = model.output(input, false);
+        long endTime = System.nanoTime();
+
+        // get difference of two nanoTime values
+        long timeElapsed = endTime - startTime;
+
+        System.out.println("Execution time in milliseconds : " +
+                timeElapsed / 1000000);
+
         System.out.println("predicted score " + out);
     }
 
