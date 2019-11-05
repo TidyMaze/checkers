@@ -44,7 +44,7 @@ object App extends App {
 
     (0 until 10).foreach { _ =>
       store.clear()
-      val states = playTillEndWithEvalFunction(Game.newGame(), monteCarloEvalFunctionWithStore(200), turnHandler)
+      val states = playTillEndWithEvalFunction(Game.newGame(), monteCarloEvalFunctionWithStore(200), turnHandler, store)
 
 //      endGamePrint(states)
 

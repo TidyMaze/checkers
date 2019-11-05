@@ -11,7 +11,7 @@ import checkers.RandomHelpers._
 import scala.annotation.tailrec
 import scala.collection.immutable.Seq
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
+import scala.collection.mutable.{ArrayBuffer, ListBuffer}
 
 object Game {
   type Player = Int
@@ -28,7 +28,7 @@ object Game {
   def playTillEndRandomlyNoHistory(state: State, onTurn: State => Unit, count: AtomicInteger): State =
     playTillEndWithEvalFunctionNoHistory(state, (_, _) => randPct, onTurn, count)
 
-  def playTillEndWithEvalFunction(state: State, eval: (State, Player, AtomicInteger) => Double, onTurn: (Action, State, Double) => Unit = (_, _, _) => ()): List[State] = {
+  def playTillEndWithEvalFunction(state: State, eval: (State, Player, AtomicInteger) => Double, onTurn: (Action, State, Double) => Unit = (_, _, _) => (), store: ListBuffer[ScoredState]): List[State] = {
     @tailrec
     def aux(s: State, acc: List[State]): List[State] = {
       val count = new AtomicInteger()
@@ -37,7 +37,22 @@ object Game {
       if (actions.isEmpty) {
         acc.reverse
       } else {
-        val (action, newState, score) = actions.par.map { case (a, candidateState) => (a, candidateState, eval(candidateState, s.nextPlayer, count)) }.maxBy { case (a, candidateState, score) => score }
+        val scoredActions: Seq[(Action, State, Double)] = actions
+          .par
+          .map { case (a, candidateState) =>
+            val score = eval(candidateState, s.nextPlayer, count)
+            val scoredState = ScoredState(candidateState, score)
+            (a, candidateState, score)
+          }.to[Seq]
+
+        store ++= scoredActions.map {
+          case (action, newState, score) => ScoredState(newState, score)
+        }
+
+        val (action, newState, score) = scoredActions
+          .maxBy { case (a, candidateState, score) =>
+            score
+          }
         val end = System.currentTimeMillis()
         val elapsed = (end - start) / 1000.0
         println()

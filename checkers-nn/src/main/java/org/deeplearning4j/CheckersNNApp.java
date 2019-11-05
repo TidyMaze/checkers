@@ -54,7 +54,7 @@ public class CheckersNNApp {
     private static final Logger log = LoggerFactory.getLogger(CheckersNNApp.class);
 
     public static void main(String[] args) throws Exception {
-        int nEpochs = 1000; // Number of training epochs
+        int nEpochs = 10000; // Number of training epochs
         int seed = 123; //
 
         /*
@@ -64,7 +64,7 @@ public class CheckersNNApp {
         RecordReader rr = new CSVRecordReader(0, ',');
         rr.initialize(new FileSplit(new File("out/dump.txt")));
 
-        RecordReaderDataSetIterator recordReaderDataSetIterator = new RecordReaderDataSetIterator(rr, 100, 64, 64, true);
+        RecordReaderDataSetIterator recordReaderDataSetIterator = new RecordReaderDataSetIterator(rr, 10000, 64, 64, true);
         DataSet allData = recordReaderDataSetIterator.next();
         allData.shuffle();
 
@@ -85,14 +85,15 @@ public class CheckersNNApp {
 
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(seed)
-                .dropOut(0.1)
-                .l2(0.001)
+//                .dropOut(0.1)
+//                .l2(0.001)
                 .weightInit(WeightInit.XAVIER)
-                .updater(new Adam(0.01))
+                .updater(new Adam(0.2))
                 .list()
-                .layer(0, new DenseLayer.Builder().nIn(64).nOut(16).activation(Activation.LEAKYRELU).build())
-                .layer(1, new DenseLayer.Builder().nIn(16).nOut(4).activation(Activation.LEAKYRELU).build())
-                .layer(2, new OutputLayer.Builder(LossFunctions.LossFunction.SQUARED_LOSS).nIn(4).nOut(1).activation(Activation.IDENTITY).build())
+                .layer(0, new DenseLayer.Builder().nIn(64).nOut(10).activation(Activation.TANH).build())
+                .layer(1, new DenseLayer.Builder().nIn(10).nOut(8).activation(Activation.TANH).build())
+                .layer(2, new DenseLayer.Builder().nIn(8).nOut(8).activation(Activation.TANH).build())
+                .layer(3, new OutputLayer.Builder(LossFunctions.LossFunction.MSE).nIn(8).nOut(1).activation(Activation.IDENTITY).build())
                 .backpropType(BackpropType.Standard)
                 .build();
 
@@ -116,8 +117,8 @@ public class CheckersNNApp {
 
         // Test the evaluation of a state
         final INDArray input = Nd4j.create(new double[] {
-                0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,-1,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0
-        }, 1, 64);
+                0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, -1, 0
+        }, 1, 64); // expected Output: 0,7809; Desired output: 0,792;
         INDArray out = model.output(input, false);
         System.out.println("predicted score " + out);
     }
