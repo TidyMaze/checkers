@@ -54,7 +54,7 @@ public class CheckersNNApp {
     private static final Logger log = LoggerFactory.getLogger(CheckersNNApp.class);
 
     public static void main(String[] args) throws Exception {
-        int nEpochs = 50000; // Number of training epochs
+        int nEpochs = 1000; // Number of training epochs
         int seed = 123; //
 
         /*
@@ -85,29 +85,14 @@ public class CheckersNNApp {
 
         MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
                 .seed(seed)
-                .dropOut(0.5)
+                .dropOut(0.1)
                 .l2(0.001)
                 .weightInit(WeightInit.XAVIER)
-                .updater(new Adam(0.0001))
+                .updater(new Adam(0.01))
                 .list()
-                .layer(0, new DenseLayer.Builder().nIn(64).nOut(64).activation(Activation.LEAKYRELU).build())
-                .layer(1, new DenseLayer.Builder().nIn(64).nOut(64).activation(Activation.LEAKYRELU).build())
-                .layer(2, new DenseLayer.Builder().nIn(64).nOut(64).activation(Activation.LEAKYRELU).build())
-                .layer(3, new DenseLayer.Builder().nIn(64).nOut(64).activation(Activation.LEAKYRELU).build())
-                .layer(4, new DenseLayer.Builder().nIn(64).nOut(32).activation(Activation.LEAKYRELU).build())
-                .layer(5, new DenseLayer.Builder().nIn(32).nOut(32).activation(Activation.LEAKYRELU).build())
-                .layer(6, new DenseLayer.Builder().nIn(32).nOut(32).activation(Activation.LEAKYRELU).build())
-                .layer(7, new DenseLayer.Builder().nIn(32).nOut(32).activation(Activation.LEAKYRELU).build())
-                .layer(8, new DenseLayer.Builder().nIn(32).nOut(32).activation(Activation.LEAKYRELU).build())
-                .layer(9, new DenseLayer.Builder().nIn(32).nOut(16).activation(Activation.LEAKYRELU).build())
-                .layer(10, new DenseLayer.Builder().nIn(16).nOut(16).activation(Activation.LEAKYRELU).build())
-                .layer(11, new DenseLayer.Builder().nIn(16).nOut(16).activation(Activation.LEAKYRELU).build())
-                .layer(12, new DenseLayer.Builder().nIn(16).nOut(16).activation(Activation.LEAKYRELU).build())
-                .layer(13, new DenseLayer.Builder().nIn(16).nOut(16).activation(Activation.LEAKYRELU).build())
-                .layer(14, new DenseLayer.Builder().nIn(16).nOut(16).activation(Activation.LEAKYRELU).build())
-                .layer(15, new DenseLayer.Builder().nIn(16).nOut(8).activation(Activation.LEAKYRELU).build())
-                .layer(16, new DenseLayer.Builder().nIn(8).nOut(4).activation(Activation.LEAKYRELU).build())
-                .layer(17, new OutputLayer.Builder(LossFunctions.LossFunction.SQUARED_LOSS).nIn(4).nOut(1).activation(Activation.IDENTITY).build())
+                .layer(0, new DenseLayer.Builder().nIn(64).nOut(16).activation(Activation.LEAKYRELU).build())
+                .layer(1, new DenseLayer.Builder().nIn(16).nOut(4).activation(Activation.LEAKYRELU).build())
+                .layer(2, new OutputLayer.Builder(LossFunctions.LossFunction.SQUARED_LOSS).nIn(4).nOut(1).activation(Activation.IDENTITY).build())
                 .backpropType(BackpropType.Standard)
                 .build();
 
