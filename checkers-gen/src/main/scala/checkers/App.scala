@@ -5,7 +5,6 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import checkers.Game._
 
-import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
 
 object App extends App {
@@ -45,7 +44,7 @@ object App extends App {
 
     (0 until 10).foreach { _ =>
       store.clear()
-      val states = playTillEndWithEvalFunction(Game.newGame(), monteCarloEvalFunctionWithStore(1000), turnHandler)
+      val states = playTillEndWithEvalFunction(Game.newGame(), monteCarloEvalFunctionWithStore(200), turnHandler)
 
 //      endGamePrint(states)
 
