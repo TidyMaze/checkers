@@ -5,11 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger
 
 import checkers.Game._
 
-import scala.collection.mutable.ListBuffer
-
 object App extends App {
-
-  val store: ListBuffer[ScoredState] = ListBuffer[ScoredState]()
 
   def transformToEploitable(scoredState: ScoredState): ScoredState = {
     val theCurrentPlayer = Player.nextPlayer(scoredState.state.nextPlayer)
@@ -24,7 +20,11 @@ object App extends App {
 
   def monteCarloEvalFunctionWithStore(samples: Int)(state: State, player: Player, count: AtomicInteger): Double = {
     val score = monteCarloEvalFunction(samples)(state, player, count)
-    store += ScoredState(state, score)
+    val usableState = transformToEploitable(ScoredState(state, score))
+    val linearGrid = usableState.state.grid.flatten.map(_.toString)
+    pw.println((linearGrid :+ usableState.score.toString).mkString(","))
+    pw.flush()
+    assert(!pw.checkError())
     score
   }
 
@@ -35,7 +35,7 @@ object App extends App {
   }
 
 
-  val file = new File("../out/dump.txt")
+  val file = new File("out/dump.txt")
   file.getParentFile.mkdirs()
   val fw = new FileWriter(file, true)
 
@@ -43,21 +43,9 @@ object App extends App {
   try {
 
     (0 until 10).foreach { _ =>
-      store.clear()
-      val states = playTillEndWithEvalFunction(Game.newGame(), monteCarloEvalFunctionWithStore(200), turnHandler, store)
+      val states = playTillEndWithEvalFunction(Game.newGame(), monteCarloEvalFunctionWithStore(100), turnHandler)
 
 //      endGamePrint(states)
-
-      println(s"${store.size} samples")
-
-      store.map(transformToEploitable)
-        .sortBy {
-          _.score
-        }
-        .foreach { scoredState =>
-          val linearGrid = scoredState.state.grid.flatten.map(_.toString)
-          pw.println((linearGrid :+ scoredState.score.toString).mkString(","))
-        }
     }
   } finally {
     pw.close()

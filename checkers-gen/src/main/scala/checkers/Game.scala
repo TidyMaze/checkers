@@ -11,7 +11,7 @@ import checkers.RandomHelpers._
 import scala.annotation.tailrec
 import scala.collection.immutable.Seq
 import scala.collection.mutable
-import scala.collection.mutable.{ArrayBuffer, ListBuffer}
+import scala.collection.mutable.ArrayBuffer
 
 object Game {
   type Player = Int
@@ -28,7 +28,7 @@ object Game {
   def playTillEndRandomlyNoHistory(state: State, onTurn: State => Unit, count: AtomicInteger): State =
     playTillEndWithEvalFunctionNoHistory(state, (_, _) => randPct, onTurn, count)
 
-  def playTillEndWithEvalFunction(state: State, eval: (State, Player, AtomicInteger) => Double, onTurn: (Action, State, Double) => Unit = (_, _, _) => (), store: ListBuffer[ScoredState]): List[State] = {
+  def playTillEndWithEvalFunction(state: State, eval: (State, Player, AtomicInteger) => Double, onTurn: (Action, State, Double) => Unit = (_, _, _) => ()): List[State] = {
     @tailrec
     def aux(s: State, acc: List[State]): List[State] = {
       val count = new AtomicInteger()
@@ -44,10 +44,6 @@ object Game {
             val scoredState = ScoredState(candidateState, score)
             (a, candidateState, score)
           }.to[Seq]
-
-        store ++= scoredActions.map {
-          case (action, newState, score) => ScoredState(newState, score)
-        }
 
         val (action, newState, score) = scoredActions
           .maxBy { case (a, candidateState, score) =>
