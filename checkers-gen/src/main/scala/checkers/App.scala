@@ -35,7 +35,7 @@ object App extends App {
   }
 
 
-  val file = new File("out/dump.txt")
+  val file = new File("../out/dump.txt")
   file.getParentFile.mkdirs()
   val fw = new FileWriter(file, true)
 

@@ -53,8 +53,8 @@ public class CheckersNNApp {
         int nEpochs = 10000; // Number of training epochs
         int seed = 123; //
 
-        File locationToSave = new File("out/model.zip");
-        File dataSetFile = new File("out/dump.txt");
+        File locationToSave = new File("../out/model.zip");
+        File dataSetFile = new File("../out/dump.txt");
 
         boolean loadExisting = true;
         boolean train = false;
