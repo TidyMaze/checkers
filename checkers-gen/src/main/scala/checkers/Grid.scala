@@ -23,13 +23,13 @@ object Grid {
     } yield eachLineFromGrids).mkString("\n")
   }
 
-  val initPattern: Seq[String] = Seq(
+  val  initPattern: Seq[String] = Seq(
     "-2-2-2-2",
     "2-2-2-2-",
+    "-2-2-2-2",
     "--------",
     "--------",
-    "--------",
-    "--------",
+    "1-1-1-1-",
     "-1-1-1-1",
     "1-1-1-1-"
   )
