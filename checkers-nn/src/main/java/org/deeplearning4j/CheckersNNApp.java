@@ -50,14 +50,14 @@ public class CheckersNNApp {
     private static final Logger log = LoggerFactory.getLogger(CheckersNNApp.class);
 
     public static void main(String[] args) throws Exception {
-        int nEpochs = 10000; // Number of training epochs
+        int nEpochs = 100000; // Number of training epochs
         int seed = 123; //
 
         File locationToSave = new File("../out/model.zip");
         File dataSetFile = new File("../out/dump.txt");
 
         boolean loadExisting = true;
-        boolean train = false;
+        boolean train = true;
 
         MultiLayerNetwork model = null;
 
@@ -104,16 +104,13 @@ public class CheckersNNApp {
             dataNormalization.transform(testData);
 
             log.info("Train model");
-            model.setListeners(new ScoreIterationListener(10)); //Print score every 10 iterations
+            model.setListeners(new ScoreIterationListener(1000)); //Print score every 10 iterations
             for (int i = 0; i < nEpochs; i++) {
                 model.fit(trainingData);
-                log.info("*** Completed epoch {} ***", i);
-
-                log.info("Evaluate model....");
                 RegressionEvaluation eval = new RegressionEvaluation();
                 INDArray output = model.output(testData.getFeatures());
                 eval.eval(testData.getLabels(), output);
-                log.info(eval.stats());
+//                log.info(eval.stats());
             }
         } else {
             System.out.println("Training is disabled");
