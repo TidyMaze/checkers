@@ -7,20 +7,20 @@ import checkers.Game._
 
 object App extends App {
 
-  def transformToEploitable(scoredState: ScoredState): ScoredState = {
-    val theCurrentPlayer = Player.nextPlayer(scoredState.state.nextPlayer)
-    val opp = scoredState.state.nextPlayer
-    val transformedGrid = scoredState.state.grid.map(line => line.map {
+  def transformToEploitable(state: State): State = {
+    val theCurrentPlayer = Player.nextPlayer(state.nextPlayer)
+    val opp = state.nextPlayer
+    val transformedGrid = state.grid.map(line => line.map {
       case `theCurrentPlayer` => 1
       case `opp` => -1
       case _ => 0
     })
-    ScoredState(scoredState.state.copy(grid = transformedGrid), scoredState.score)
+    state.copy(grid = transformedGrid)
   }
 
   def monteCarloEvalFunctionWithStore(samples: Int)(state: State, player: Player, count: AtomicInteger): Double = {
     val score = monteCarloEvalFunction(samples)(state, player, count)
-    val usableState = transformToEploitable(ScoredState(state, score))
+    val usableState = ScoredState(transformToEploitable(state), score)
     val linearGrid = usableState.state.grid.flatten.map(_.toString)
     pw.println((linearGrid :+ usableState.score.toString).mkString(","))
     pw.flush()
@@ -28,12 +28,18 @@ object App extends App {
     score
   }
 
+  def getNNScore(state: State) = 42
+
+  def neuralNetworkEvalFunction(samples: Int)(state: State, player: Player, count: AtomicInteger): Double = {
+    val usableState = transformToEploitable(state)
+    getNNScore(usableState)
+  }
+
   val turnHandler: (Action, State, Double) => Unit = (action, currentState, score) => {
     println()
     println(s"Playing $action with expected winrate $score for player ${Player.nextPlayer(currentState.nextPlayer)}")
     println(currentState)
   }
-
 
   val file = new File("../out/dump.txt")
   file.getParentFile.mkdirs()

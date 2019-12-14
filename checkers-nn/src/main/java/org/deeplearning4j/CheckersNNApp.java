@@ -57,7 +57,7 @@ public class CheckersNNApp {
         File dataSetFile = new File("../out/dump.txt");
 
         boolean loadExisting = true;
-        boolean train = true;
+        boolean train = false;
 
         MultiLayerNetwork model = null;
 
@@ -121,8 +121,8 @@ public class CheckersNNApp {
 
         // Test the evaluation of a state
         final INDArray input = Nd4j.create(new double[]{
-                0, 1, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, -1, 0
-        }, 1, 64); // expected Output: 0,7809; Desired output: 0,792;
+                0,-1,0,-1,0,-1,0,0,0,0,-1,0,-1,0,0,0,0,0,0,-1,0,0,0,-1,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0,0,0,0,0,1,0,1,0,0,1,0,1,0,1,0,0,0
+        }, 1, 64); // Desired output: 0,39;
 
         long startTime = System.nanoTime();
 
