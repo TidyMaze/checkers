@@ -4,6 +4,9 @@ import java.io.{File, FileWriter, PrintWriter}
 import java.util.concurrent.atomic.AtomicInteger
 
 import checkers.Game._
+import org.deeplearning4j.nn.multilayer.MultiLayerNetwork
+import org.nd4j.linalg.api.ndarray.INDArray
+import org.nd4j.linalg.factory.Nd4j
 
 object App extends App {
 
@@ -28,12 +31,19 @@ object App extends App {
     score
   }
 
-  def getNNScore(state: State) = 42
+  def getNNScore(state: State) = {
+    val linear = state.grid.flatten.map(_.toDouble)
+    val input = Nd4j.create(linear.toArray, 1, 64)
+    model.output(input, false).getDouble(0L)
+  }
 
-  def neuralNetworkEvalFunction(samples: Int)(state: State, player: Player, count: AtomicInteger): Double = {
+  def neuralNetworkEvalFunction(state: State, player: Player, count: AtomicInteger): Double = {
     val usableState = transformToEploitable(state)
     getNNScore(usableState)
   }
+
+  val modelLocation = new File("../out/model.zip")
+  val model = MultiLayerNetwork.load(modelLocation, true)
 
   val turnHandler: (Action, State, Double) => Unit = (action, currentState, score) => {
     println()
@@ -49,7 +59,7 @@ object App extends App {
   try {
 
     (0 until 10).foreach { _ =>
-      val states = playTillEndWithEvalFunction(Game.newGame(), monteCarloEvalFunctionWithStore(100), turnHandler)
+      val states = playTillEndWithEvalFunction(Game.newGame(), neuralNetworkEvalFunction, turnHandler)
 
 //      endGamePrint(states)
     }
