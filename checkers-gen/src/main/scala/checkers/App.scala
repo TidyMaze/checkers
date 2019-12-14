@@ -10,6 +10,8 @@ import org.nd4j.linalg.factory.Nd4j
 
 object App extends App {
 
+  val generateData = true
+
   def transformToEploitable(state: State): State = {
     val theCurrentPlayer = Player.nextPlayer(state.nextPlayer)
     val opp = state.nextPlayer
@@ -59,8 +61,11 @@ object App extends App {
   try {
 
     (0 until 10).foreach { _ =>
-      val states = playTillEndWithEvalFunction(Game.newGame(), neuralNetworkEvalFunction, turnHandler)
-
+      if(generateData){
+        playTillEndWithEvalFunction(Game.newGame(), monteCarloEvalFunctionWithStore(1000), turnHandler)
+      } else {
+        playTillEndWithEvalFunction(Game.newGame(), neuralNetworkEvalFunction, turnHandler)
+      }
 //      endGamePrint(states)
     }
   } finally {
